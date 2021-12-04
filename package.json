@@ -1,5 +1,5 @@
 {
-  "name": "nextjs",
+  "name": "elsie-bray-bot",
   "version": "1.0.0",
   "private": true,
   "scripts": {
@@ -9,12 +9,12 @@
     "lint": "next lint"
   },
   "dependencies": {
-    "next": "12.0.1",
-    "react": "17.0.2",
-    "react-dom": "17.0.2"
+    "next": "^12.0.1",
+    "react": "^17.0.2",
+    "react-dom": "^17.0.2"
   },
   "devDependencies": {
-    "eslint": "7.32.0",
-    "eslint-config-next": "11.1.0"
+    "eslint": "^7.32.0",
+    "eslint-config-next": "^11.1.0"
   }
 }
