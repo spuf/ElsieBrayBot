@@ -27,7 +27,7 @@ bot.command('poll', (ctx) => {
   const options = [30, 60, 90, 120].map((m) =>
     ['Europe/Moscow', 'Europe/London']
       .map((tz) => time.plus({ minutes: m }).setZone(tz).toFormat('HH:mm') + ' ' + zoneNames[tz])
-      .join(' | ')
+      .join('    ')
   )
   options.push('Pass')
   return ctx.replyWithPoll('When are you ready to play?', options, {
