@@ -13,7 +13,7 @@ const bot = new Telegraf(token, {
 })
 bot.use(Telegraf.log())
 
-const keyboard = Markup.keyboard([Markup.button.callback('Play time poll', 'poll')]).resize()
+const keyboard = Markup.keyboard(['/poll']).resize()
 
 bot.start((ctx) => ctx.reply(`I don't even have time to explain why I don't have time to explain.`, keyboard))
 
@@ -21,7 +21,7 @@ const zoneNames = {
   'Europe/Moscow': 'MSK',
   'Europe/London': 'LND',
 }
-bot.action('poll', (ctx) => {
+bot.command('poll', (ctx) => {
   const now = DateTime.now()
   const time = now.plus({ minutes: 10 - (now.minute % 10) })
   const options = [30, 60, 90, 120].map((m) =>
