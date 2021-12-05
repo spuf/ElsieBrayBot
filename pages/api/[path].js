@@ -13,11 +13,11 @@ const bot = new Telegraf(token, {
 })
 bot.use(Telegraf.log())
 
-const keyboard = Markup.keyboard([Markup.button.callback('Play', 'play')])
+const keyboard = Markup.keyboard([Markup.button.callback('Play poll', 'poll')])
 
 bot.start((ctx) => ctx.reply(`I don't even have time to explain why I don't have time to explain.`, keyboard))
 
-bot.command('play', (ctx) => {
+bot.command('poll', (ctx) => {
   const options = [][(30, 60, 90, 120)].forEach((m) => {
     const time = DateTime.now(plus({ minutes: m }))
     const option = ['Europe/Moscow', 'Europe/London']
