@@ -13,7 +13,7 @@ const bot = new Telegraf(token, {
 })
 bot.use(Telegraf.log())
 
-const keyboard = Markup.keyboard([Markup.button.callback('Play poll', 'poll')])
+const keyboard = Markup.keyboard([Markup.button.callback('Play poll', '/poll')])
 
 bot.start((ctx) => ctx.reply(`I don't even have time to explain why I don't have time to explain.`, keyboard))
 
