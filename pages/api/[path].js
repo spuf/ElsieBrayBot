@@ -18,13 +18,10 @@ const keyboard = Markup.keyboard([Markup.button.callback('Play poll', 'poll')])
 bot.start((ctx) => ctx.reply(`I don't even have time to explain why I don't have time to explain.`, keyboard))
 
 bot.command('poll', (ctx) => {
-  const options = [][(30, 60, 90, 120)].forEach((m) => {
-    const time = DateTime.now(plus({ minutes: m }))
-    const option = ['Europe/Moscow', 'Europe/London']
-      .map((tz) => time.setZone(tz).toLocaleString(DateTime.TIME_24_WITH_SHORT_OFFSET))
+  const options = [30, 60, 90, 120].map((m) =>  ['Europe/Moscow', 'Europe/London']
+      .map((tz) => DateTime.now(plus({ minutes: m })).setZone(tz).toLocaleString(DateTime.TIME_24_WITH_SHORT_OFFSET))
       .join(' / ')
-    options.push(option)
-  })
+  )
   options.push('Pass')
   return ctx.replyWithPoll('When are you ready to play?', options, {
     is_anonymous: false,
