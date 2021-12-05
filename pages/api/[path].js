@@ -13,7 +13,7 @@ const bot = new Telegraf(token, {
 })
 bot.use(Telegraf.log())
 
-const keyboard = Markup.keyboard([Markup.button.callback('Play poll', '/poll')])
+const keyboard = Markup.keyboard([Markup.button.callback('Play time poll', 'poll')]).resize()
 
 bot.start((ctx) => ctx.reply(`I don't even have time to explain why I don't have time to explain.`, keyboard))
 
@@ -21,7 +21,7 @@ const zoneNames = {
   'Europe/Moscow': 'MSK',
   'Europe/London': 'LND',
 }
-bot.command('poll', (ctx) => {
+bot.action('poll', (ctx) => {
   const now = DateTime.now()
   const time = now.plus({ minutes: 10 - (now.minute % 10) })
   const options = [30, 60, 90, 120].map((m) =>
@@ -29,13 +29,13 @@ bot.command('poll', (ctx) => {
       .map((tz) => time.plus({ minutes: m }).setZone(tz).toFormat('HH:mm') + ' ' + zoneNames[tz])
       .join('    ')
   )
+  options.push('Later')
   options.push('Pass')
   return ctx.replyWithPoll('When are you ready to play?', options, {
     is_anonymous: false,
   })
 })
 
-bot.telegram.setMyCommands()
 export default function handler(req, res) {
   if (path === 'init') {
     if (req.method !== 'GET') {
