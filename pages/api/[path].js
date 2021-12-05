@@ -19,7 +19,7 @@ bot.start((ctx) => ctx.reply(`I don't even have time to explain why I don't have
 
 bot.command('poll', (ctx) => {
   const now = DateTime.now()
-  const time = now.plus({ minutes: 10 - (now.minutes % 10) })
+  const time = now.plus({ minutes: 10 - (now.minute % 10) })
   const options = [30, 60, 90, 120].map((m) =>
     ['Europe/Moscow', 'Europe/London']
       .map((tz) => time.plus({ minutes: m }).setZone(tz).toFormat('H:mm (ZZ)'))
