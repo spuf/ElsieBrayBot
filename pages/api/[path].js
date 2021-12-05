@@ -1,4 +1,5 @@
 import { Telegraf, Markup } from 'telegraf'
+import { DateTime } from 'luxon'
 
 const token = process.env.BOT_TOKEN
 const base = process.env.BOT_HOOK_BASE
@@ -12,16 +13,25 @@ const bot = new Telegraf(token, {
 })
 bot.use(Telegraf.log())
 
-const keyboard = Markup.keyboard([Markup.button.pollRequest('Play time poll', 'regular')])
+const keyboard = Markup.keyboard([Markup.button.callback('Play', 'play')])
 
 bot.start((ctx) => ctx.reply(`I don't even have time to explain why I don't have time to explain.`, keyboard))
 
-bot.command('poll', (ctx) =>
-  ctx.replyWithPoll('When you are ready to play?', ['In 1 hour', '2 hours', '3 hours', '4 hours', 'pass'], {
+bot.command('play', (ctx) => {
+  const options = [][(30, 60, 90, 120)].forEach((m) => {
+    const time = DateTime.now(plus({ minutes: m }))
+    const option = ['Europe/Moscow', 'Europe/London']
+      .map((tz) => time.setZone(tz).toLocaleString(DateTime.TIME_24_WITH_SHORT_OFFSET))
+      .join(' / ')
+    options.push(option)
+  })
+  options.push('Pass')
+  return ctx.replyWithPoll('When are you ready to play?', options, {
     is_anonymous: false,
   })
-)
+})
 
+bot.telegram.setMyCommands()
 export default function handler(req, res) {
   if (path === 'init') {
     if (req.method !== 'GET') {
