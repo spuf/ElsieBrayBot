@@ -10,13 +10,16 @@ if (!token || !base || !path) {
 const bot = new Telegraf(token, {
   telegram: { webhookReply: true },
 })
+bot.use(Telegraf.log())
 
 const keyboard = Markup.keyboard([Markup.button.pollRequest('Play time poll', 'regular')])
 
-bot.start((ctx) => ctx.reply(`I don't even have time to explain why I don't have time to explain.`), keyboard)
+bot.start((ctx) => ctx.reply(`I don't even have time to explain why I don't have time to explain.`, keyboard))
 
 bot.command('poll', (ctx) =>
-  ctx.replyWithPoll('When you are ready to play?', ['In 1 hour', '2 hours', '3 hours', '4 hours', '5 hours'], { is_anonymous: false })
+  ctx.replyWithPoll('When you are ready to play?', ['In 1 hour', '2 hours', '3 hours', '4 hours', 'pass'], {
+    is_anonymous: false,
+  })
 )
 
 export default function handler(req, res) {
