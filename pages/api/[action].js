@@ -1,14 +1,14 @@
 import { Telegraf, Markup } from 'telegraf'
 import { DateTime } from 'luxon'
 
-const token = process.env.BOT_TOKEN
-const base = process.env.BOT_HOOK_BASE
-const path = process.env.BOT_HOOK_PATH
-if (!token || !base || !path) {
+const bot_token = process.env.BOT_TOKEN
+const bot_hook_base = process.env.BOT_HOOK_BASE
+const bot_hook_action = process.env.BOT_HOOK_PATH
+if (!bot_token || !bot_hook_base || !bot_hook_action) {
   throw new Error()
 }
 
-const bot = new Telegraf(token, {
+const bot = new Telegraf(bot_token, {
   telegram: { webhookReply: true },
 })
 bot.use(Telegraf.log())
@@ -37,15 +37,15 @@ bot.command('poll', (ctx) => {
 })
 
 export default function handler(req, res) {
-  if (path === 'init') {
+  if (req.query.action === 'init') {
     if (req.method !== 'GET') {
       return res.status(405).end()
     }
 
-    return bot.telegram.setWebhook(base + path).then(() => res.status(200).end())
+    return bot.telegram.setWebhook(bot_hook_base + bot_hook_action).then(() => res.status(200).end())
   }
 
-  if (req.query.path === path) {
+  if (req.query.action === bot_hook_action) {
     if (req.method !== 'POST') {
       return res.status(405).end()
     }

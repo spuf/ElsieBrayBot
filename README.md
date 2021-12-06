@@ -19,4 +19,5 @@ npm run dev
 - https://github.com/telegraf/telegraf
 - https://vercel.com
 - https://upstash.com
+- https://supabase.io
 - https://logflare.app
