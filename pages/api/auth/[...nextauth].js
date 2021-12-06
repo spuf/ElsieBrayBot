@@ -9,6 +9,7 @@ export default NextAuth({
         url: 'https://www.bungie.net/en/oauth/authorize',
         params: {
           scope: null,
+          response_type: 'code'
         },
       },
       clientId: process.env.BUNGIE_CLIENT_ID,
@@ -16,7 +17,7 @@ export default NextAuth({
       headers: {
         'X-API-Key': process.env.BUNGIE_API_KEY,
       },
-      userinfo: 'https://www.bungie.net/platform/User/GetBungieNetUserById/{membershipId}/',
+      userinfo: 'https://www.bungie.net/platform/User/GetMembershipsForCurrentUser/',
     }),
   ],
 })
