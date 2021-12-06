@@ -2,9 +2,10 @@ import { Telegraf, Markup } from 'telegraf'
 import { DateTime } from 'luxon'
 
 const bot_token = process.env.BOT_TOKEN
-const bot_hook_base = process.env.BOT_HOOK_BASE
-const bot_hook_action = process.env.BOT_HOOK_PATH
-if (!bot_token || !bot_hook_base || !bot_hook_action) {
+const bot_base_url = process.env.BOT_BASE_URL
+const bot_hook_action = process.env.BOT_HOOK_ACTION
+const bot_cron_action = process.env.BOT_CRON_ACTION
+if (!bot_token || !bot_base_url || !bot_hook_action || !bot_cron_action) {
   throw new Error()
 }
 
@@ -37,12 +38,14 @@ bot.command('poll', (ctx) => {
 })
 
 export default function handler(req, res) {
-  if (req.query.action === 'init') {
-    if (req.method !== 'GET') {
+  if (req.query.action === bot_cron_action) {
+    if (req.method !== 'POST') {
       return res.status(405).end()
     }
 
-    return bot.telegram.setWebhook(bot_hook_base + bot_hook_action).then(() => res.status(200).end())
+    return bot.telegram
+      .setWebhook(bot_base_url + bot_hook_action, { max_connections: 1 })
+      .then(() => res.status(200).end())
   }
 
   if (req.query.action === bot_hook_action) {
