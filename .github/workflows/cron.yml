@@ -6,4 +6,4 @@ jobs:
   cron:
     runs-on: ubuntu-latest
     steps:
-      - run: curl -fsSL '${{ secrets.CRON_URL }}'
+      - run: curl -fsSL -X POST '${{ secrets.CRON_URL }}'
