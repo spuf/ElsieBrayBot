@@ -16,6 +16,18 @@ export default NextAuth({
       headers: {
         'X-API-Key': process.env.BUNGIE_API_KEY,
       },
+      userinfo: 'https://www.bungie.net/platform/User/User.GetBungieNetUserById/{membershipId}/',
+      profile(profile) {
+        const { bungieNetUser: user } = profile.Response
+        return {
+          id: user.membershipId,
+          name: user.displayName,
+          email: null,
+          image: `https://www.bungie.net${user.profilePicturePath.startsWith('/') ? '' : '/'}${
+            user.profilePicturePath
+          }`,
+        }
+      },
     }),
   ],
 })
