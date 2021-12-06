@@ -8,16 +8,24 @@ export default NextAuth({
       authorization: {
         url: 'https://www.bungie.net/en/oauth/authorize',
         params: {
+          reauth: null,
           scope: null,
-          response_type: 'code'
         },
       },
+      token: 'https://www.bungie.net/platform/app/oauth/token/',
       clientId: process.env.BUNGIE_CLIENT_ID,
       clientSecret: process.env.BUNGIE_SECRET,
       headers: {
         'X-API-Key': process.env.BUNGIE_API_KEY,
       },
-      userinfo: 'https://www.bungie.net/platform/User/GetMembershipsForCurrentUser/',
+      userinfo: {
+        request: ({ tokens }) => {
+          return { id: tokens.membership_id }
+        },
+      },
+      profile: ({ id }) => {
+        return { id: id }
+      },
     }),
   ],
 })

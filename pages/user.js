@@ -5,7 +5,7 @@ export default function User() {
   if (session) {
     return (
       <div>
-        Signed in as {session.user.name} <br />
+        Signed in as {session.user.id} <br />
         <button onClick={() => signOut()}>Sign out</button>
       </div>
     )
