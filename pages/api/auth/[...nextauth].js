@@ -5,11 +5,17 @@ export default NextAuth({
   secret: process.env.NEXTAUTH_SECRET,
   providers: [
     BungieProvider({
-        clientId: process.env.BUNGIE_CLIENT_ID,
-        clientSecret: process.env.BUNGIE_SECRET,
-        headers: {
-          'X-API-Key': process.env.BUNGIE_API_KEY
-        }
-      }),
+      authorization: {
+        url: 'https://www.bungie.net/en/oauth/authorize',
+        params: {
+          scope: null,
+        },
+      },
+      clientId: process.env.BUNGIE_CLIENT_ID,
+      clientSecret: process.env.BUNGIE_SECRET,
+      headers: {
+        'X-API-Key': process.env.BUNGIE_API_KEY,
+      },
+    }),
   ],
 })
