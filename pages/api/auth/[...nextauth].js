@@ -3,6 +3,13 @@ import BungieProvider from 'next-auth/providers/bungie'
 
 export default NextAuth({
   secret: process.env.NEXTAUTH_SECRET,
+  pages: {
+    signIn: '/auth/signin',
+    signOut: '/auth/signout',
+    error: '/auth/error', // Error code passed in query string as ?error=
+    verifyRequest: null,
+    newUser: null
+  },
   providers: [
     BungieProvider({
       authorization: {
@@ -20,12 +27,11 @@ export default NextAuth({
       },
       userinfo: {
         request: ({ tokens }) => {
-          return { id: tokens.membership_id }
+          console.log(tokens)
+          return { id: tokens.membership_id, name: `#${tokens.membership_id}` }
         },
       },
-      profile: ({ id }) => {
-        return { id: id }
-      },
+      profile: (data) => data,
     }),
   ],
 })
