@@ -1,0 +1,9 @@
+name: Cron
+on:
+  schedule:
+    - cron: '*/15 * * * *'
+jobs:
+  cron:
+    runs-on: ubuntu-latest
+    steps:
+      - run: curl -fsSL '${{ secrets.CRON_URL }}'
