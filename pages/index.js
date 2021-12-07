@@ -1,28 +1,28 @@
-import Head from 'next/head'
-import Image from 'next/image'
-import styles from '../styles/Home.module.css'
+import avatar from '../public/avatar.jpg'
 
-export default function Home() {
+export default function Index() {
+  const size = 122
   return (
-    <div className={styles.container}>
-      <Head>
-        <title>ElsieBrayBot</title>
-        <link rel="icon" href="/favicon.ico" />
-      </Head>
+    <div className="center">
+      <p>
+        <img
+          src={avatar.src}
+          alt="ElsieBrayBot"
+          style={{
+            width: `${size}px`,
+            height: `${size}px`,
+            borderRadius: `${size / 2}px`,
+          }}
+        />
+      </p>
 
-      <main className={styles.main}>
-        <p className={styles.description}>
-          <Image src="/avatar.jpg" alt="ElsieBrayBot" width={122} height={122} className={styles.avatar} />
-        </p>
+      <h1>ElsieBrayBot</h1>
 
-        <h1 className={styles.title}>ElsieBrayBot</h1>
-
-        <p className={styles.description}>
-          <a href="https://t.me/ElsieBrayBot" target="_blank" rel="noreferrer">
-            https://t.me/ElsieBrayBot
-          </a>
-        </p>
-      </main>
+      <p>
+        <a href="https://t.me/ElsieBrayBot" target="_blank" rel="noreferrer">
+          https://t.me/ElsieBrayBot
+        </a>
+      </p>
     </div>
   )
 }
