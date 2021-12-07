@@ -40,7 +40,7 @@ bot.command('poll', (ctx) => {
 bot.command('login', (ctx) =>
   ctx.reply(
     'Many Guardians fell. Strong ones. But you made it here.',
-    Markup.inlineKeyboard([Markup.button.login('Let me in', 'https://elsiebraybot.spuf.ru/api/auth/telegram')]).oneTime().resize()
+    Markup.inlineKeyboard([Markup.button.login('Let me in', 'https://elsiebraybot.spuf.ru/api/auth/telegram')])
   )
 )
 
