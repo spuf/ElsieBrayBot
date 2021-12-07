@@ -38,7 +38,7 @@ export default async function handler(req, res) {
       return res.status(200).json({ message: 'Redirecting to Bungie.net...', url: generateAuthUrl(req.query.state) })
     }
 
-    return res.status(200).json({ message: 'Transferring data...', url: 'tg://resolve' })
+    return res.status(200).json({ message: 'Operation is completed!' })
   }
 
   return res.status(404).end()
