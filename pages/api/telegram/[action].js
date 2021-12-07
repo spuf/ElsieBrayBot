@@ -1,5 +1,8 @@
 import { Telegraf, Markup } from 'telegraf'
 import { DateTime } from 'luxon'
+const {
+  publicRuntimeConfig: { baseUrl },
+} = getConfig()
 
 const bot_token = process.env.BOT_TOKEN
 const bot_base_url = process.env.BOT_BASE_URL
@@ -40,7 +43,7 @@ bot.command('poll', (ctx) => {
 bot.command('login', (ctx) =>
   ctx.reply(
     'Many Guardians fell. Strong ones. But you made it here.',
-    Markup.inlineKeyboard([Markup.button.login('Let me in', 'https://elsiebraybot.spuf.ru/api/auth/telegram')])
+    Markup.inlineKeyboard([Markup.button.login('Let me in', `${baseUrl}/guardian`)])
   )
 )
 
