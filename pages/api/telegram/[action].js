@@ -37,15 +37,27 @@ bot.command('poll', (ctx) => {
   })
 })
 
+bot.command('login', (ctx) =>
+  ctx.reply(
+    'Many Guardians fell. Strong ones. But you made it here.',
+    Markup.inlineKeyboard([Markup.button.login('Let me in', 'https://elsiebraybot.spuf.ru/api/auth/telegram')]).oneTime().resize()
+  )
+)
+
 export default function handler(req, res) {
   if (req.query.action === bot_cron_action) {
     if (req.method !== 'POST') {
       return res.status(405).end()
     }
 
-    return bot.telegram
-      .setWebhook(bot_base_url + bot_hook_action, { max_connections: 1 })
-      .then(() => res.status(200).end())
+    return Promise.all([
+      bot.telegram.setWebhook(bot_base_url + bot_hook_action, { max_connections: 1 }),
+      bot.telegram.setMyCommands([
+        { command: 'start', description: 'System wipe' },
+        { command: 'poll', description: 'When are you ready to play?' },
+        { command: 'login', description: 'Let me in' },
+      ]),
+    ]).then(() => res.status(200).end())
   }
 
   if (req.query.action === bot_hook_action) {
