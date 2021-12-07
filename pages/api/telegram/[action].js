@@ -1,5 +1,7 @@
 import { Telegraf, Markup } from 'telegraf'
 import { DateTime } from 'luxon'
+import getConfig from 'next/config'
+
 const {
   publicRuntimeConfig: { baseUrl },
 } = getConfig()
