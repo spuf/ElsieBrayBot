@@ -18,7 +18,7 @@ export default async function handler(req, res) {
     const state = { telegram_id: req.query.id }
     const jwt = await jwtSign(state, DateTime.now().plus({ minutes: 15 }).toSeconds())
 
-    return res.status(200).json({ message: `Welcome, ${req.query.username}!`, url: `/guardian?state=${jwt}` })
+    return res.status(200).json({ message: `Welcome, @${req.query.username}!`, url: `/guardian?state=${jwt}` })
   }
 
   if (req.query.action === 'bungie') {
@@ -38,7 +38,7 @@ export default async function handler(req, res) {
       return res.status(200).json({ message: 'Redirecting to Bungie.net...', url: generateAuthUrl(req.query.state) })
     }
 
-    return res.status(200).json({ message: 'Transfering data...', url: 'tg://resolve' })
+    return res.status(200).json({ message: 'Transferring data...', url: 'tg://resolve' })
   }
 
   return res.status(404).end()
