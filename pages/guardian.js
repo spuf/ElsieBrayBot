@@ -6,17 +6,17 @@ const {
 } = getConfig()
 
 export default function Guardian({ message, url }) {
-  if (url) {
-    useEffect(() => {
+  useEffect(() => {
+    if (url) {
       setTimeout(() => {
         window.location.replace(url)
       }, 1000)
-    })
-  }
+    }
+  })
   return (
     <div className="center">
       <p>
-        <a href="/">← Return to Orbit</a>
+        <a href={'/'}>← Return to Orbit</a>
       </p>
       <p>{message}</p>
       {url && (
