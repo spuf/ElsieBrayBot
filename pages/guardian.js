@@ -10,6 +10,9 @@ export default function Guardian({ message, url }) {
     if (url) {
       setTimeout(() => {
         window.location.replace(url)
+        setTimeout(() => {
+          window.close()
+        }, 5000)
       }, 1000)
     }
   })
