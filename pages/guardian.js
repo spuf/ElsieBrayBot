@@ -1,27 +1,30 @@
-import getConfig from 'next/config'
 import { useEffect } from 'react'
-
-const {
-  publicRuntimeConfig: { baseUrl },
-} = getConfig()
+import Link from 'next/link'
+import { useRouter } from 'next/router'
 
 export default function Guardian({ message, url }) {
+  const router = useRouter()
   useEffect(() => {
     if (url) {
       setTimeout(() => {
-        window.location.replace(url)
+        router.replace(url)
       }, 1000)
     }
   })
+
   return (
     <div className="center">
       <p>
-        <a href={'/'}>← Return to Orbit</a>
+        <Link href="/">
+          <a>← Return to Orbit</a>
+        </Link>
       </p>
       <p>{message}</p>
       {url && (
         <p>
-          <a href={url}>Continue →</a>
+          <Link href={url} replace>
+            <a>Continue →</a>
+          </Link>
         </p>
       )}
     </div>
@@ -29,14 +32,16 @@ export default function Guardian({ message, url }) {
 }
 
 export async function getServerSideProps({ query, resolvedUrl }) {
-  const url = new URL(resolvedUrl, baseUrl)
+  const url = new URL(resolvedUrl, process.env.BASE_URL)
   let data
 
   if (query.id && query.hash) {
-    const res = await fetch(`${baseUrl}/api/auth/telegram${url.search}`)
+    url.pathname = '/api/auth/telegram'
+    const res = await fetch(url.toString())
     data = await res.json()
   } else if (query.state) {
-    const res = await fetch(`${baseUrl}/api/auth/bungie${url.search}`)
+    url.pathname = '/api/auth/bungie'
+    const res = await fetch(url.toString())
     data = await res.json()
   } else {
     data = { message: 'You must start login from Telegram.' }
