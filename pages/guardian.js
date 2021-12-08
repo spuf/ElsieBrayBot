@@ -49,7 +49,7 @@ export default function Guardian({ message, url, token }) {
       </div>
     )
   }
-  console.log(data)
+
   const { telegram_username, bungie_username } = data
   return (
     <div className="center">
@@ -67,7 +67,7 @@ export default function Guardian({ message, url, token }) {
 
 export async function getServerSideProps({ query, resolvedUrl }) {
   const url = new URL(resolvedUrl, process.env.BASE_URL)
-  let props = null
+  let props = {}
   if (query.id && query.hash) {
     url.pathname = '/api/auth/telegram'
     const res = await fetch(url.toString())
@@ -76,9 +76,6 @@ export async function getServerSideProps({ query, resolvedUrl }) {
     url.pathname = '/api/auth/bungie'
     const res = await fetch(url.toString())
     props = await res.json()
-  }
-  if (!props) {
-    props = { message: 'You must start login from Telegram.' }
   }
 
   return { props }
