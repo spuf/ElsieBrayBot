@@ -56,7 +56,7 @@ export default async function handler(req, res) {
 
     return res.status(200).json({
       message: `Hello, ${state.bungie_username}!`,
-      url: 'https://elsiebraybot.spuf.ru/guardian', //new URL('/guardian', process.env.BASE_URL).toString(),
+      url: new URL('/guardian', process.env.BASE_URL).toString(),
       token: jwt,
     })
   }
