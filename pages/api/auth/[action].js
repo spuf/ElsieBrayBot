@@ -18,7 +18,10 @@ export default async function handler(req, res) {
     const state = { telegram_id: req.query.id }
     const jwt = await jwtSign(state, DateTime.now().plus({ minutes: 15 }).toSeconds())
 
-    return res.status(200).json({ message: `Welcome, @${req.query.username}!`, url: `/guardian?state=${jwt}` })
+    const url = new URL('/guardian', process.env.BASE_URL)
+    url.searchParams.set('state', jwt)
+
+    return res.status(200).json({ message: `Welcome, @${req.query.username}!`, url: url.toString() })
   }
 
   if (req.query.action === 'bungie') {
