@@ -1,6 +1,7 @@
 import { DateTime } from 'luxon'
 import { checkAuth } from '../../../lib/telegram'
 import { sign, verify } from '../../../lib/crypt'
+import { saveUser } from '../../../lib/store'
 import * as Bungie from '../../../lib/bungie'
 
 export default async function handler(req, res) {
@@ -52,14 +53,14 @@ export default async function handler(req, res) {
 
     const tokens = await Bungie.getAccessToken(req.query.code)
     tokens.expires_in = tokens.expires_in || 3600
-
     state.bungie_id = tokens.membership_id
-    state.access_token = tokens.access_token
 
     const user = await Bungie.getBungieNetUserById(state.access_token, state.bungie_id)
     state.bungie_username = user.uniqueName
 
     const jwt = await sign(state, DateTime.now().plus({ seconds: tokens.expires_in }).toSeconds())
+
+    await saveUser(state.telegram_id, { ...state, tokens })
 
     return res.status(200).json({
       message: `Hello, ${state.bungie_username}!`,
