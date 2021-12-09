@@ -1,6 +1,6 @@
 import { Telegraf, Markup } from 'telegraf'
 import { DateTime } from 'luxon'
-import { loadUser } from '../../../lib/store'
+import { readUser } from '../../../lib/store'
 
 const bot_token = process.env.BOT_TOKEN
 const bot_base_url = process.env.BOT_BASE_URL
@@ -46,7 +46,7 @@ bot.command('login', (ctx) =>
 )
 
 bot.command('whoami', async (ctx) => {
-  const user = await loadUser(ctx.from.id)
+  const user = await readUser(ctx.from.id)
   const answer = user?.bungie_username || 'Who knows...'
   return await ctx.reply(answer, { reply_to_message_id: ctx.message.id })
 })
