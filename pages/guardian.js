@@ -65,11 +65,11 @@ export async function getServerSideProps({ query, resolvedUrl, req: { cookies },
     if (res.ok) {
       props = await res.json()
     } else {
-      res.setHeader('Set-Cookie', `token=undefined; HttpOnly; Secure; Max-Age=0`)
+      res.setHeader('Set-Cookie', `token=; HttpOnly; Secure; Max-Age=0`)
     }
   }
-  if (props.token && props.exp) {
-    res.setHeader('Set-Cookie', `token=${props.token}; HttpOnly; Secure; Max-Age=${props.exp}`)
+  if (props.token && props.expires_in) {
+    res.setHeader('Set-Cookie', `token=${props.token}; HttpOnly; Secure; Max-Age=${props.expires_in}`)
   }
 
   return { props }
