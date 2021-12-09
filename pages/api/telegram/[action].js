@@ -15,7 +15,7 @@ const bot = new Telegraf(bot_token, {
 })
 bot.use(Telegraf.log())
 
-const keyboard = Markup.keyboard(['/poll']).resize()
+const keyboard = Markup.keyboard(['/poll']).resize().oneTime()
 
 bot.start((ctx) => ctx.reply(`I don't even have time to explain why I don't have time to explain.`, keyboard))
 
@@ -29,7 +29,7 @@ bot.command('poll', (ctx) => {
   const options = [30, 60, 90, 120].map((m) =>
     ['Europe/Moscow', 'Europe/London']
       .map((tz) => time.plus({ minutes: m }).setZone(tz).toFormat('HH:mm') + ' ' + zoneNames[tz])
-      .join(' '.repeat(4)),
+      .join(' '.repeat(4))
   )
   options.push('Later')
   options.push('Pass')
@@ -41,14 +41,27 @@ bot.command('poll', (ctx) => {
 bot.command('login', (ctx) =>
   ctx.reply(
     'Many Guardians fell. Strong ones. But you made it here.',
-    Markup.inlineKeyboard([Markup.button.login('Let me in', new URL('/guardian', process.env.BASE_URL).toString())]),
-  ),
+    Markup.inlineKeyboard([
+      Markup.button.login('Let me in', new URL('/guardian', process.env.BASE_URL).toString()),
+      Markup.button.callback('Never mind', 'delete'),
+    ])
+  )
 )
 
 bot.command('whoami', async (ctx) => {
   const user = await readUser(ctx.from.id)
   const answer = user?.bungie_username || 'Who knows...'
-  return await ctx.reply(answer, { reply_to_message_id: ctx.message.message_id })
+  return await ctx.reply(answer, {
+    reply_to_message_id: ctx.message.chat.type !== 'private' ? ctx.message.message_id : null,
+  })
+})
+
+bot.command('debug', async (ctx) => {
+  if (ctx.message.chat.type !== 'private') {
+    return
+  }
+  const user = await readUser(ctx.from.id)
+  return await ctx.reply(JSON.stringify(user))
 })
 
 export default function handler(req, res) {

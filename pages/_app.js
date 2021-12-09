@@ -5,7 +5,7 @@ import NextNProgress from 'nextjs-progressbar'
 function ElsieBray({ Component, pageProps }) {
   return (
     <div className="container">
-      <NextNProgress />
+      <NextNProgress options={{ showSpinner: false }} />
       <Head>
         <title>ElsieBrayBot</title>
       </Head>
