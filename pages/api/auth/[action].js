@@ -60,7 +60,7 @@ export default async function handler(req, res) {
 
     const jwt = await sign(state, DateTime.now().plus({ seconds: tokens.expires_in }).toSeconds())
 
-    await saveUser(state.telegram_id, { ...state, tokens })
+    await saveUser(state.telegram_id, { ...state, tokens, user })
 
     return res.status(200).json({
       message: `Hello, ${state.bungie_username}!`,
