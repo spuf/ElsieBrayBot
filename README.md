@@ -17,7 +17,6 @@ npm run dev
 
 - https://core.telegram.org/bots/api
 - https://github.com/telegraf/telegraf
+- https://bungie-net.github.io/multi
 - https://vercel.com
-- https://upstash.com
-- https://supabase.io
-- https://logflare.app
+- https://firebase.google.com
