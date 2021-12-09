@@ -65,6 +65,7 @@ export default async function handler(req, res) {
       message: `Hello, ${state.bungie_username}!`,
       url: new URL('/guardian', process.env.BASE_URL).toString(),
       token: jwt,
+      exp: tokens.expires_in,
     })
   }
 
@@ -78,7 +79,7 @@ export default async function handler(req, res) {
       return res.status(401).json({ message: 'You must start login from Telegram.' })
     }
 
-    return res.status(200).json(state)
+    return res.status(200).json({ state })
   }
 
   return res.status(404).end()
