@@ -1,5 +1,6 @@
 import { Telegraf, Markup } from 'telegraf'
 import { DateTime } from 'luxon'
+import { loadUser } from '../../../lib/store'
 
 const bot_token = process.env.BOT_TOKEN
 const bot_base_url = process.env.BOT_BASE_URL
@@ -44,6 +45,11 @@ bot.command('login', (ctx) =>
   ),
 )
 
+bot.command('whomai', async (ctx) => {
+  const user = await loadUser(ctx.from.id)
+  return ctx.reply(user.bungie_username, { reply_to_message_id: ctx.message.id })
+})
+
 export default function handler(req, res) {
   if (req.query.action === bot_cron_action) {
     if (req.method !== 'POST') {
@@ -58,6 +64,7 @@ export default function handler(req, res) {
         { command: 'start', description: 'System wipe' },
         { command: 'poll', description: 'When are you ready to play?' },
         { command: 'login', description: 'Let me in' },
+        { command: 'whoami', description: 'Who am I?' },
       ]),
     ]).then(() => res.status(200).end())
   }
