@@ -19,7 +19,12 @@ export default function Guardian({ message, url, token }) {
       const token = localStorage.getItem('token')
       if (token) {
         fetch(`/api/auth/check?token=${token}`)
-          .then((res) => res.json())
+          .then((res) => {
+            if (!res.ok) {
+              throw res.status
+            }
+            return res.json()
+          })
           .then((data) => setData({ token, ...data }))
           .catch((e) => {
             console.error(e)
