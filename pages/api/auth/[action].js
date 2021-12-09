@@ -36,11 +36,11 @@ export default async function handler(req, res) {
       return res.status(405).end()
     }
 
-    const state = await verify(req.query.state)
-    if (!state) {
+    const payload = await verify(req.query.state)
+    if (!payload) {
       return res.status(401).json({ message: 'You must start login from Telegram.' })
     }
-    if (!state.telegram_id) {
+    if (!payload.telegram_id) {
       return res.status(401).json({ message: 'Telegram login seems broken.' })
     }
 
@@ -52,13 +52,16 @@ export default async function handler(req, res) {
     }
 
     const tokens = await Bungie.getAccessToken(req.query.code)
-    tokens.expires_in = tokens.expires_in || 3600
-    state.bungie_id = tokens.membership_id
-
     const user = await Bungie.getBungieNetUserById(tokens.access_token, state.bungie_id)
-    state.bungie_username = user.uniqueName
 
-    const jwt = await sign(state, DateTime.now().plus({ seconds: tokens.expires_in }).toSeconds())
+    const state = {
+      telegram_id: payload.telegram_id,
+      telegram_username: payload.telegram_username,
+      bungie_id: tokens.membership_id,
+      bungie_username: user.uniqueName,
+    }
+    const jwt_expires_in = 60 * 60 * 24 * 7
+    const jwt = await sign(state, DateTime.now().plus({ seconds: jwt_expires_in }).toSeconds())
 
     await saveUser(state.telegram_id, { ...state, tokens, user })
 
@@ -66,7 +69,7 @@ export default async function handler(req, res) {
       message: `Hello, ${state.bungie_username}!`,
       url: new URL('/guardian', process.env.BASE_URL).toString(),
       token: jwt,
-      expires_in: tokens.expires_in,
+      expires_in: jwt_expires_in,
     })
   }
 
