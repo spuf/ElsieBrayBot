@@ -65,7 +65,7 @@ export default async function handler(req, res) {
       message: `Hello, ${state.bungie_username}!`,
       url: new URL('/guardian', process.env.BASE_URL).toString(),
       token: jwt,
-      exp: tokens.expires_in,
+      expires_in: tokens.expires_in,
     })
   }
 
