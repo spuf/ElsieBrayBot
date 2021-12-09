@@ -28,7 +28,7 @@ bot.command('poll', (ctx) => {
   const options = [30, 60, 90, 120].map((m) =>
     ['Europe/Moscow', 'Europe/London']
       .map((tz) => time.plus({ minutes: m }).setZone(tz).toFormat('HH:mm') + ' ' + zoneNames[tz])
-      .join('    ')
+      .join('    '),
   )
   options.push('Later')
   options.push('Pass')
@@ -40,8 +40,8 @@ bot.command('poll', (ctx) => {
 bot.command('login', (ctx) =>
   ctx.reply(
     'Many Guardians fell. Strong ones. But you made it here.',
-    Markup.inlineKeyboard([Markup.button.login('Let me in', new URL('/guardian', process.env.BASE_URL).toString())])
-  )
+    Markup.inlineKeyboard([Markup.button.login('Let me in', new URL('/guardian', process.env.BASE_URL).toString())]),
+  ),
 )
 
 export default function handler(req, res) {
@@ -51,7 +51,9 @@ export default function handler(req, res) {
     }
 
     return Promise.all([
-      bot.telegram.setWebhook(bot_base_url + bot_hook_action, { max_connections: 1 }),
+      bot.telegram.setWebhook(bot_base_url + bot_hook_action, {
+        max_connections: 1,
+      }),
       bot.telegram.setMyCommands([
         { command: 'start', description: 'System wipe' },
         { command: 'poll', description: 'When are you ready to play?' },

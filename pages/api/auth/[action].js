@@ -15,13 +15,19 @@ export default async function handler(req, res) {
       return res.status(401).json({ message: 'Telegram sends invalid data.' })
     }
 
-    const state = { telegram_id: req.query.id, telegram_username: req.query.username }
+    const state = {
+      telegram_id: req.query.id,
+      telegram_username: req.query.username,
+    }
     const jwt = await jwtSign(state, DateTime.now().plus({ minutes: 15 }).toSeconds())
 
     const url = new URL('/guardian', process.env.BASE_URL)
     url.searchParams.set('state', jwt)
 
-    return res.status(200).json({ message: `Welcome, @${state.telegram_username}!`, url: url.toString() })
+    return res.status(200).json({
+      message: `Welcome, @${state.telegram_username}!`,
+      url: url.toString(),
+    })
   }
 
   if (req.query.action === 'bungie') {
@@ -38,9 +44,10 @@ export default async function handler(req, res) {
     }
 
     if (!req.query.code) {
-      return res
-        .status(200)
-        .json({ message: 'Redirecting to Bungie.net...', url: Bungie.generateAuthUrl(req.query.state) })
+      return res.status(200).json({
+        message: 'Redirecting to Bungie.net...',
+        url: Bungie.generateAuthUrl(req.query.state),
+      })
     }
 
     const tokens = await Bungie.getAccessToken(req.query.code)
