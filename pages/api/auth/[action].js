@@ -1,6 +1,6 @@
 import { DateTime } from 'luxon'
 import { checkAuth } from '../../../lib/telegram'
-import { jwtSign, jwtVerify } from '../../../lib/jwt'
+import { sign, verify } from '../../../lib/crypt'
 import * as Bungie from '../../../lib/bungie'
 
 export default async function handler(req, res) {
@@ -19,7 +19,7 @@ export default async function handler(req, res) {
       telegram_id: req.query.id,
       telegram_username: req.query.username,
     }
-    const jwt = await jwtSign(state, DateTime.now().plus({ minutes: 15 }).toSeconds())
+    const jwt = await sign(state, DateTime.now().plus({ minutes: 15 }).toSeconds())
 
     const url = new URL('/guardian', process.env.BASE_URL)
     url.searchParams.set('state', jwt)
@@ -35,7 +35,7 @@ export default async function handler(req, res) {
       return res.status(405).end()
     }
 
-    const state = await jwtVerify(req.query.state)
+    const state = await verify(req.query.state)
     if (!state) {
       return res.status(401).json({ message: 'You must start login from Telegram.' })
     }
@@ -59,7 +59,7 @@ export default async function handler(req, res) {
     const user = await Bungie.getBungieNetUserById(state.access_token, state.bungie_id)
     state.bungie_username = user.uniqueName
 
-    const jwt = await jwtSign(state, DateTime.now().plus({ seconds: tokens.expires_in }).toSeconds())
+    const jwt = await sign(state, DateTime.now().plus({ seconds: tokens.expires_in }).toSeconds())
 
     return res.status(200).json({
       message: `Hello, ${state.bungie_username}!`,
@@ -74,7 +74,7 @@ export default async function handler(req, res) {
       return res.status(405).end()
     }
 
-    const state = await jwtVerify(req.query.token)
+    const state = await verify(req.query.token)
     if (!state) {
       return res.status(401).json({ message: 'You must start login from Telegram.' })
     }
