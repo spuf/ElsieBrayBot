@@ -41,10 +41,7 @@ bot.command('poll', (ctx) => {
 bot.command('login', (ctx) =>
   ctx.reply(
     'Many Guardians fell. Strong ones. But you made it here.',
-    Markup.inlineKeyboard([
-      Markup.button.login('Let me in', new URL('/guardian', process.env.BASE_URL).toString()),
-      Markup.button.callback('Never mind', 'delete'),
-    ])
+    Markup.inlineKeyboard([Markup.button.login('Let me in', new URL('/guardian', process.env.BASE_URL).toString())])
   )
 )
 
