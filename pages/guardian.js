@@ -2,40 +2,17 @@ import { useEffect, useState } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 
-export default function Guardian({ message, url, token }) {
+export default function Guardian({ message, url, state }) {
   const router = useRouter()
-  const [data, setData] = useState({
-    token: null,
-  })
   useEffect(() => {
-    if (token) {
-      localStorage.setItem('token', token)
-    }
     if (url) {
       setTimeout(() => {
         router.replace(url)
       }, 1000)
-    } else {
-      const token = localStorage.getItem('token')
-      if (token) {
-        fetch(`/api/auth/check?token=${token}`)
-          .then((res) => {
-            if (!res.ok) {
-              throw res.status
-            }
-            return res.json()
-          })
-          .then((data) => setData({ token, ...data }))
-          .catch((e) => {
-            console.error(e)
-            localStorage.removeItem('token')
-            router.reload()
-          })
-      }
     }
-  }, [url, router, token, setData])
+  }, [url, router])
 
-  if (!data.token) {
+  if (!state) {
     return (
       <div className="center">
         <p>
@@ -55,7 +32,7 @@ export default function Guardian({ message, url, token }) {
     )
   }
 
-  const { telegram_username, bungie_username } = data
+  const { telegram_username, bungie_username } = state
   return (
     <div className="center">
       <p>
@@ -70,7 +47,7 @@ export default function Guardian({ message, url, token }) {
   )
 }
 
-export async function getServerSideProps({ query, resolvedUrl }) {
+export async function getServerSideProps({ query, resolvedUrl, req: { cookies }, res }) {
   const url = new URL(resolvedUrl, process.env.BASE_URL)
   let props = {}
   if (query.id && query.hash) {
@@ -81,6 +58,18 @@ export async function getServerSideProps({ query, resolvedUrl }) {
     url.pathname = '/api/auth/bungie'
     const res = await fetch(url.toString())
     props = await res.json()
+  } else if (cookies.token) {
+    url.pathname = '/api/auth/check'
+    url.searchParams.set('token', cookies.token)
+    const res = await fetch(url.toString())
+    if (res.ok) {
+      props = await res.json()
+    } else {
+      res.setHeader('Set-Cookie', `token=undefined; HttpOnly; Secure; Max-Age=0`)
+    }
+  }
+  if (props.token && props.exp) {
+    res.setHeader('Set-Cookie', `token=${props.token}; HttpOnly; Secure; Max-Age=${props.exp}`)
   }
 
   return { props }
