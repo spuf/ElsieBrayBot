@@ -10,7 +10,6 @@
     "fmt": "prettier --ignore-path .gitignore --write ."
   },
   "dependencies": {
-    "firebase": "^9.6.0",
     "firebase-admin": "^10.0.0",
     "jose": "^4.3.7",
     "luxon": "^2.1.1",
