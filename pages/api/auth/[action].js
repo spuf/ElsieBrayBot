@@ -52,7 +52,7 @@ export default async function handler(req, res) {
     }
 
     const tokens = await Bungie.getAccessToken(req.query.code)
-    const user = await Bungie.getBungieNetUserById(tokens.access_token, state.bungie_id)
+    const user = await Bungie.getBungieNetUserById(tokens.access_token, tokens.membership_id)
 
     const state = {
       telegram_id: payload.telegram_id,
