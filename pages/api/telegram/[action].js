@@ -47,7 +47,7 @@ bot.command('login', (ctx) =>
 
 bot.command('whomai', async (ctx) => {
   const user = await loadUser(ctx.from.id)
-  return ctx.reply(user.bungie_username, { reply_to_message_id: ctx.message.id })
+  return await ctx.reply(user.bungie_username, { reply_to_message_id: ctx.message.id })
 })
 
 export default function handler(req, res) {
