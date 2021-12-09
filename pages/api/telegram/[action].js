@@ -28,7 +28,7 @@ bot.command('poll', (ctx) => {
   const options = [30, 60, 90, 120].map((m) =>
     ['Europe/Moscow', 'Europe/London']
       .map((tz) => time.plus({ minutes: m }).setZone(tz).toFormat('HH:mm') + ' ' + zoneNames[tz])
-      .join('\t'),
+      .join(' '.repeat(4)),
   )
   options.push('Later')
   options.push('Pass')
