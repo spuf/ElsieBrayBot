@@ -55,7 +55,7 @@ export default async function handler(req, res) {
     tokens.expires_in = tokens.expires_in || 3600
     state.bungie_id = tokens.membership_id
 
-    const user = await Bungie.getBungieNetUserById(state.access_token, state.bungie_id)
+    const user = await Bungie.getBungieNetUserById(tokens.access_token, state.bungie_id)
     state.bungie_username = user.uniqueName
 
     const jwt = await sign(state, DateTime.now().plus({ seconds: tokens.expires_in }).toSeconds())
