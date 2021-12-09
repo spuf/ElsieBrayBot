@@ -51,9 +51,11 @@ bot.command('login', (ctx) =>
 bot.command('whoami', async (ctx) => {
   const user = await readUser(ctx.from.id)
   const answer = user?.bungie_username || 'Who knows...'
-  return await ctx.reply(answer, {
-    reply_to_message_id: ctx.message.chat.type !== 'private' ? ctx.message.message_id : null,
-  })
+  const options = {}
+  if (ctx.message.chat.type !== 'private') {
+    options[reply_to_message_id] = ctx.message.message_id
+  }
+  return await ctx.reply(answer, options)
 })
 
 bot.command('debug', async (ctx) => {
@@ -61,7 +63,7 @@ bot.command('debug', async (ctx) => {
     return
   }
   const user = await readUser(ctx.from.id)
-  return await ctx.reply(JSON.stringify(user))
+  return await ctx.reply('```json\n' + JSON.stringify(user, null, 2) + '\n```', { parse_mode: 'MarkdownV2' })
 })
 
 export default function handler(req, res) {
