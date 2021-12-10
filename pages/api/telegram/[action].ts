@@ -1,8 +1,9 @@
 import { Telegraf, Markup } from 'telegraf'
 import { DateTime } from 'luxon'
-import { readUser } from '../../../lib/store'
+import { readUser, saveUser } from '../../../lib/store'
 import type { NextApiRequest, NextApiResponse } from 'next'
 import { ExtraReplyMessage } from 'telegraf/typings/telegram-types'
+import * as Bungie from '../../../lib/bungie'
 
 const bot_token = process.env.BOT_TOKEN
 const bot_base_url = process.env.BOT_BASE_URL
@@ -49,12 +50,22 @@ bot.command('login', (ctx) =>
 
 bot.command('whoami', async (ctx) => {
   const user = await readUser(ctx.from.id)
-  const answer = user?.bungie_username || 'Who knows...'
+  if (user) {
+    const answer = await Bungie.getBungieNetUserById(user.tokens)
+    user.tokens = answer.tokens
+
+    user.bungie_id = answer.data.membershipId
+    user.bungie_username = answer.data.uniqueName
+
+    await saveUser(ctx.from.id, user)
+  }
+
+  const text = user?.bungie_username || 'Who knows...'
   const options: ExtraReplyMessage = {}
   if (ctx.message.chat.type !== 'private') {
     options.reply_to_message_id = ctx.message.message_id
   }
-  return await ctx.reply(answer, options)
+  return await ctx.reply(text, options)
 })
 
 bot.command('debug', async (ctx) => {

@@ -5,6 +5,7 @@ import { GetServerSideProps } from 'next'
 import { InferGetServerSidePropsType } from 'next'
 import nookies from 'nookies'
 import { AuthResponse } from './api/auth/[action]'
+import axios from 'axios'
 
 export default function Guardian({ message, url, state }: InferGetServerSidePropsType<typeof getServerSideProps>) {
   const router = useRouter()
@@ -58,19 +59,20 @@ export const getServerSideProps: GetServerSideProps<AuthResponse> = async (ctx) 
   let props: AuthResponse = {}
   if (query.id && query.hash) {
     url.pathname = '/api/auth/telegram'
-    const res = await fetch(url.toString())
-    props = await res.json()
+    const res = await axios.get(url.toString())
+    props = res.data
   } else if (query.state) {
     url.pathname = '/api/auth/bungie'
-    const res = await fetch(url.toString())
-    props = await res.json()
+    const res = await axios.get(url.toString())
+    props = res.data
   } else if (cookies.token) {
     url.pathname = '/api/auth/check'
     url.searchParams.set('token', cookies.token)
-    const res = await fetch(url.toString())
-    if (res.ok) {
-      props = await res.json()
-    } else {
+    try {
+      const res = await axios.get(url.toString())
+      props = res.data
+    } catch (e) {
+      console.error(e)
       nookies.destroy(ctx, 'token')
     }
   }
