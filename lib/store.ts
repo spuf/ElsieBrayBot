@@ -9,7 +9,7 @@ admin.initializeApp({
 export async function saveUser(id, data) {
   const key = await hash(id.toString())
   const value = await encrypt(data)
-  return new Promise((resolve, reject) => {
+  return new Promise<void>((resolve, reject) => {
     admin
       .database()
       .ref(`users/${key}`)

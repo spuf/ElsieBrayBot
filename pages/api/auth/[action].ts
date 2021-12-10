@@ -3,13 +3,28 @@ import { checkAuth } from '../../../lib/telegram'
 import { sign, verify } from '../../../lib/crypt'
 import { saveUser } from '../../../lib/store'
 import * as Bungie from '../../../lib/bungie'
+import type { NextApiRequest, NextApiResponse } from 'next'
 
-export default async function handler(req, res) {
+interface State {
+  telegram_id: string
+  telegram_username: string
+  bungie_id?: string
+  bungie_username?: string
+}
+export interface AuthResponse {
+  message?: string
+  url?: string
+  token?: string
+  expires_in?: number
+  state?: State
+}
+
+export default async function handler(req: NextApiRequest, res: NextApiResponse<AuthResponse>) {
   if (req.query.action === 'telegram') {
     if (req.method !== 'GET') {
       return res.status(405).end()
     }
-    if (req.query.auth_date < DateTime.now().minus({ minutes: 1 }).toSeconds()) {
+    if (Number(req.query.auth_date) < DateTime.now().minus({ minutes: 1 }).toSeconds()) {
       return res.status(401).json({ message: 'Telegram sends expired data.' })
     }
     if (!checkAuth(req.query)) {
@@ -36,7 +51,11 @@ export default async function handler(req, res) {
       return res.status(405).end()
     }
 
-    const payload = await verify(req.query.state)
+    if (typeof req.query.state !== 'string') {
+      return res.status(401).json({ message: 'You must start login from Telegram.' })
+    }
+
+    const payload = await verify<State>(req.query.state)
     if (!payload) {
       return res.status(401).json({ message: 'You must start login from Telegram.' })
     }
@@ -44,7 +63,7 @@ export default async function handler(req, res) {
       return res.status(401).json({ message: 'Telegram login seems broken.' })
     }
 
-    if (!req.query.code) {
+    if (typeof req.query.code !== 'string') {
       return res.status(200).json({
         message: 'Redirecting to Bungie.net...',
         url: Bungie.generateAuthUrl(req.query.state),
@@ -78,7 +97,11 @@ export default async function handler(req, res) {
       return res.status(405).end()
     }
 
-    const state = await verify(req.query.token)
+    if (typeof req.query.token !== 'string') {
+      return res.status(401).json({ message: 'You must start login from Telegram.' })
+    }
+
+    const state = await verify<State>(req.query.token)
     if (!state) {
       return res.status(401).json({ message: 'You must start login from Telegram.' })
     }

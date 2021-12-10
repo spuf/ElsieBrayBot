@@ -1,8 +1,12 @@
 import { useEffect } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
+import { GetServerSideProps } from 'next'
+import { InferGetServerSidePropsType } from 'next'
+import nookies from 'nookies'
+import { AuthResponse } from './api/auth/[action]'
 
-export default function Guardian({ message, url, state }) {
+export default function Guardian({ message, url, state }: InferGetServerSidePropsType<typeof getServerSideProps>) {
   const router = useRouter()
   useEffect(() => {
     if (url) {
@@ -47,9 +51,11 @@ export default function Guardian({ message, url, state }) {
   )
 }
 
-export async function getServerSideProps({ query, resolvedUrl, req: { cookies }, res }) {
+export const getServerSideProps: GetServerSideProps<AuthResponse> = async (ctx) => {
+  const cookies = nookies.get(ctx)
+  const { query, resolvedUrl } = ctx
   const url = new URL(resolvedUrl, process.env.BASE_URL)
-  let props = {}
+  let props: AuthResponse = {}
   if (query.id && query.hash) {
     url.pathname = '/api/auth/telegram'
     const res = await fetch(url.toString())
@@ -65,11 +71,15 @@ export async function getServerSideProps({ query, resolvedUrl, req: { cookies },
     if (res.ok) {
       props = await res.json()
     } else {
-      res.setHeader('Set-Cookie', `token=; HttpOnly; Secure; Max-Age=0`)
+      nookies.destroy(ctx, 'token')
     }
   }
   if (props.token && props.expires_in) {
-    res.setHeader('Set-Cookie', `token=${props.token}; HttpOnly; Secure; Max-Age=${props.expires_in}`)
+    nookies.set(ctx, 'token', props.token, {
+      secure: true,
+      httpOnly: true,
+      maxAge: props.expires_in,
+    })
   }
 
   return { props }
