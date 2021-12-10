@@ -5,7 +5,7 @@ import { saveUser } from '../../../lib/store'
 import * as Bungie from '../../../lib/bungie'
 import type { NextApiRequest, NextApiResponse } from 'next'
 
-interface State {
+export interface State {
   telegram_id: string
   telegram_username: string
   bungie_id?: string

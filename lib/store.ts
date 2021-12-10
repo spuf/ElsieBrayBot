@@ -1,4 +1,6 @@
 import * as admin from 'firebase-admin'
+import { State } from '../pages/api/auth/[action]'
+import * as Bungie from './bungie'
 import { encrypt, decrypt, hash } from './crypt'
 
 admin.initializeApp({
@@ -6,8 +8,13 @@ admin.initializeApp({
   databaseURL: 'https://elsie-bray-bot-default-rtdb.firebaseio.com',
 })
 
-export async function saveUser(id, data) {
-  const key = await hash(id.toString())
+export interface UserModel extends State {
+  tokens?: Bungie.TokenSet
+  user: Bungie.GeneralUser
+}
+
+export async function saveUser(id: string, data: UserModel) {
+  const key = await hash(id)
   const value = await encrypt(data)
   return new Promise<void>((resolve, reject) => {
     admin
@@ -23,8 +30,8 @@ export async function saveUser(id, data) {
   })
 }
 
-export async function readUser(id) {
-  const key = await hash(id.toString())
+export async function readUser(id: string): Promise<UserModel> {
+  const key = await hash(id)
   const snapshot = await admin.database().ref(`users/${key}`).get()
   const value = snapshot.val()
   if (!value) {
