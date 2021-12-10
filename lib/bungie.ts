@@ -41,7 +41,7 @@ export async function getAccessToken(code: string): Promise<TokenSet> {
 
 // https://github.com/Bungie-net/api/wiki/OAuth-Documentation#refreshing-the-access-token
 async function refreshAccessToken(tokens: TokenSet): Promise<TokenSet> {
-  if (tokens.created_at + tokens.expires_in < DateTime.now().toSeconds()) {
+  if (DateTime.now().toSeconds() < tokens.created_at + tokens.expires_in) {
     return tokens
   }
 
