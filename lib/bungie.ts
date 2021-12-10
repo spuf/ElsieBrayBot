@@ -11,7 +11,7 @@ export function generateAuthUrl(state: string): string {
   return url.toString()
 }
 
-interface TokenSet {
+export interface TokenSet {
   created_at?: number
   access_token?: string
   token_type?: string
@@ -61,7 +61,7 @@ async function refreshAccessToken(tokens: TokenSet): Promise<TokenSet> {
   return { ...(res.data as TokenSet), created_at: Math.floor(DateTime.now().toSeconds()) }
 }
 
-async function ask(tokens: TokenSet, url: string): Promise<{ tokens: TokenSet; data }> {
+async function ask<T>(tokens: TokenSet, url: string): Promise<{ tokens: TokenSet; data: T }> {
   tokens = await refreshAccessToken(tokens)
   const res = await axios.get(url, {
     headers: {
@@ -73,7 +73,15 @@ async function ask(tokens: TokenSet, url: string): Promise<{ tokens: TokenSet; d
   return { tokens, data: res.data.Response }
 }
 
+export interface GeneralUser {
+  membershipId: string
+  uniqueName: string
+}
+
 // https://bungie-net.github.io/multi/operation_get_User-GetBungieNetUserById.html#operation_get_User-GetBungieNetUserById
 export async function getBungieNetUserById(tokens: TokenSet) {
-  return await ask(tokens, `https://www.bungie.net/Platform/User/GetBungieNetUserById/${tokens.membership_id}/`)
+  return await ask<GeneralUser>(
+    tokens,
+    `https://www.bungie.net/Platform/User/GetBungieNetUserById/${tokens.membership_id}/`
+  )
 }

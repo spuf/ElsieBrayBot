@@ -5,22 +5,12 @@ import type { NextApiRequest, NextApiResponse } from 'next'
 import { ExtraReplyMessage } from 'telegraf/typings/telegram-types'
 import * as Bungie from '../../../lib/bungie'
 
-const bot_token = process.env.BOT_TOKEN
-const bot_base_url = process.env.BOT_BASE_URL
-const bot_hook_action = process.env.BOT_HOOK_ACTION
-const bot_cron_action = process.env.BOT_CRON_ACTION
-if (!bot_token || !bot_base_url || !bot_hook_action || !bot_cron_action) {
-  throw new Error()
-}
-
-const bot = new Telegraf(bot_token, {
+const bot = new Telegraf(process.env.BOT_TOKEN, {
   telegram: { webhookReply: true },
 })
 bot.use(Telegraf.log())
 
-const keyboard = Markup.keyboard(['/poll']).resize().oneTime()
-
-bot.start((ctx) => ctx.reply(`I don't even have time to explain why I don't have time to explain.`, keyboard))
+bot.start((ctx) => ctx.reply(`I don't even have time to explain why I don't have time to explain.`))
 
 const zoneNames = {
   'Europe/Moscow': 'MSK',
@@ -49,15 +39,16 @@ bot.command('login', (ctx) =>
 )
 
 bot.command('whoami', async (ctx) => {
-  const user = await readUser(ctx.from.id)
+  const user = await readUser(ctx.from.id.toString())
   if (user) {
     const answer = await Bungie.getBungieNetUserById(user.tokens)
     user.tokens = answer.tokens
 
     user.bungie_id = answer.data.membershipId
     user.bungie_username = answer.data.uniqueName
+    user.user = answer.data
 
-    await saveUser(ctx.from.id, user)
+    await saveUser(ctx.from.id.toString(), user)
   }
 
   const text = user?.bungie_username || 'Who knows...'
@@ -72,18 +63,18 @@ bot.command('debug', async (ctx) => {
   if (ctx.message.chat.type !== 'private') {
     return
   }
-  const user = await readUser(ctx.from.id)
+  const user = await readUser(ctx.from.id.toString())
   return await ctx.reply('```json\n' + JSON.stringify(user, null, 2) + '\n```', { parse_mode: 'MarkdownV2' })
 })
 
 export default function handler(req: NextApiRequest, res: NextApiResponse<void>) {
-  if (req.query.action === bot_cron_action) {
+  if (req.query.action === process.env.BOT_CRON_ACTION) {
     if (req.method !== 'POST') {
       return res.status(405).end()
     }
 
     return Promise.all([
-      bot.telegram.setWebhook(bot_base_url + bot_hook_action, {
+      bot.telegram.setWebhook(process.env.BOT_BASE_URL + process.env.BOT_HOOK_ACTION, {
         max_connections: 1,
       }),
       bot.telegram.setMyCommands([
@@ -95,7 +86,7 @@ export default function handler(req: NextApiRequest, res: NextApiResponse<void>)
     ]).then(() => res.status(200).end())
   }
 
-  if (req.query.action === bot_hook_action) {
+  if (req.query.action === process.env.BOT_HOOK_ACTION) {
     if (req.method !== 'POST') {
       return res.status(405).end()
     }
