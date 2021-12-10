@@ -1,6 +1,8 @@
 import { Telegraf, Markup } from 'telegraf'
 import { DateTime } from 'luxon'
 import { readUser } from '../../../lib/store'
+import type { NextApiRequest, NextApiResponse } from 'next'
+import { ExtraReplyMessage } from 'telegraf/typings/telegram-types'
 
 const bot_token = process.env.BOT_TOKEN
 const bot_base_url = process.env.BOT_BASE_URL
@@ -48,9 +50,9 @@ bot.command('login', (ctx) =>
 bot.command('whoami', async (ctx) => {
   const user = await readUser(ctx.from.id)
   const answer = user?.bungie_username || 'Who knows...'
-  const options = {}
+  const options: ExtraReplyMessage = {}
   if (ctx.message.chat.type !== 'private') {
-    options[reply_to_message_id] = ctx.message.message_id
+    options.reply_to_message_id = ctx.message.message_id
   }
   return await ctx.reply(answer, options)
 })
@@ -63,7 +65,7 @@ bot.command('debug', async (ctx) => {
   return await ctx.reply('```json\n' + JSON.stringify(user, null, 2) + '\n```', { parse_mode: 'MarkdownV2' })
 })
 
-export default function handler(req, res) {
+export default function handler(req: NextApiRequest, res: NextApiResponse<void>) {
   if (req.query.action === bot_cron_action) {
     if (req.method !== 'POST') {
       return res.status(405).end()

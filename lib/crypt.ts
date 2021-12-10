@@ -29,10 +29,10 @@ export async function sign(payload, exp) {
     .sign(await getCryptKey())
 }
 
-export async function verify(token) {
+export async function verify<T>(token: string): Promise<T> {
   try {
     const { payload } = await jose.jwtVerify(token, await getCryptKey())
-    return payload
+    return <T>(<unknown>payload)
   } catch (e) {
     console.error(e)
     return null

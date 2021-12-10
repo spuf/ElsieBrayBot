@@ -9,7 +9,7 @@ export function generateAuthUrl(state) {
 }
 
 // https://github.com/Bungie-net/api/wiki/OAuth-Documentation#access-token-request
-export async function getAccessToken(code) {
+export async function getAccessToken(code: string) {
   const basicAuth = Buffer.from(`${process.env.BUNGIE_CLIENT_ID}:${process.env.BUNGIE_SECRET}`).toString('base64')
   const res = await fetch('https://www.bungie.net/platform/app/oauth/token/', {
     method: 'POST',
@@ -27,7 +27,7 @@ export async function getAccessToken(code) {
 }
 
 // https://github.com/Bungie-net/api/wiki/OAuth-Documentation#refreshing-the-access-token
-async function refreshAccessToken(refresh_token) {
+async function refreshAccessToken(tokens) {
   const basicAuth = Buffer.from(`${process.env.BUNGIE_CLIENT_ID}:${process.env.BUNGIE_SECRET}`).toString('base64')
   const res = await fetch('https://www.bungie.net/platform/app/oauth/token/', {
     method: 'POST',
@@ -37,7 +37,7 @@ async function refreshAccessToken(refresh_token) {
     },
     body: new URLSearchParams({
       grant_type: 'refresh_token',
-      refresh_token,
+      refresh_token: tokens.refresh_token,
     }).toString(),
   })
 
