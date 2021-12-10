@@ -25,7 +25,7 @@ const encrypt_header = { alg: 'ECDH-ES', enc: 'A256GCM' }
 export async function sign(payload, exp) {
   return await new jose.SignJWT(payload)
     .setProtectedHeader(sign_header)
-    .setExpirationTime(Math.round(exp))
+    .setExpirationTime(Math.floor(exp))
     .sign(await getCryptKey())
 }
 

@@ -70,19 +70,20 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse<
       })
     }
 
-    const tokens = await Bungie.getAccessToken(req.query.code)
-    const user = await Bungie.getBungieNetUserById(tokens)
+    let tokens = await Bungie.getAccessToken(req.query.code)
+    const answer = await Bungie.getBungieNetUserById(tokens)
+    tokens = answer.tokens
 
     const state = {
       telegram_id: payload.telegram_id,
       telegram_username: payload.telegram_username,
-      bungie_id: tokens.membership_id,
-      bungie_username: user.uniqueName,
+      bungie_id: answer.data.membershipId,
+      bungie_username: answer.data.uniqueName,
     }
     const jwt_expires_in = 60 * 60 * 24 * 7
     const jwt = await sign(state, DateTime.now().plus({ seconds: jwt_expires_in }).toSeconds())
 
-    await saveUser(state.telegram_id, { ...state, tokens, user })
+    await saveUser(state.telegram_id, { ...state, tokens, user: answer.data })
 
     return res.status(200).json({
       message: `Hello, ${state.bungie_username}!`,
