@@ -13,6 +13,10 @@ enum DestinyComponentType {
   CharacterActivities = 204,
 }
 
+enum Locale {
+  en = 'en',
+}
+
 // https://github.com/Bungie-net/api/wiki/OAuth-Documentation#authorization-request
 export function generateAuthUrl(state: string): string {
   const url = new URL('https://www.bungie.net/en/oauth/authorize')
@@ -73,7 +77,14 @@ export async function refreshAccessToken(tokens: TokenSet): Promise<TokenSet> {
   return { ...(res.data as TokenSet), created_at: Math.floor(DateTime.now().toSeconds()) }
 }
 
-export interface DestinyManifest {}
+export interface DestinyManifest {
+  jsonWorldComponentContentPaths: {
+    [locale in Locale]: {
+      DestinyActivityDefinition: {}
+    }
+  }
+  jsonWorldContentPaths: { [locale in Locale]: {} }
+}
 export async function getDestinyManifest(): Promise<DestinyManifest> {
   try {
     const res = await axios.get('https://www.bungie.net/Platform/Destiny2/Manifest/', {
@@ -81,6 +92,12 @@ export async function getDestinyManifest(): Promise<DestinyManifest> {
         'X-API-Key': process.env.BUNGIE_API_KEY,
       },
     })
+    const data = res.data.Response
+    data.jsonWorldComponentContentPaths.en.DestinyActivityDefinition = (
+      await axios.get(data.jsonWorldComponentContentPaths.en.DestinyActivityDefinition, {
+        baseURL: 'https://www.bungie.net/Platform',
+      })
+    ).data
     return res.data.Response
   } catch (e) {
     console.error(e.message, e.response.data ?? e.request)

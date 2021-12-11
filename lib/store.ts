@@ -8,6 +8,21 @@ admin.initializeApp({
   databaseURL: 'https://elsie-bray-bot-default-rtdb.firebaseio.com',
 })
 
+async function save(key: string, value: any) {
+  return new Promise<void>((resolve, reject) => {
+    admin
+      .database()
+      .ref(key)
+      .set(value, (e) => {
+        if (e) {
+          reject(e)
+        } else {
+          resolve()
+        }
+      })
+  })
+}
+
 export interface UserModel extends State {
   tokens?: Bungie.TokenSet
   bungie?: Bungie.GeneralUser
@@ -19,18 +34,7 @@ export interface UserModel extends State {
 export async function saveUser(id: string, data: UserModel) {
   const key = await hash(id)
   const value = await encrypt(data)
-  return new Promise<void>((resolve, reject) => {
-    admin
-      .database()
-      .ref(`users/${key}`)
-      .set(value, (e) => {
-        if (e) {
-          reject(e)
-        } else {
-          resolve()
-        }
-      })
-  })
+  return await save(`users/${key}`, value)
 }
 
 export async function readUser(id: string): Promise<UserModel> {
@@ -44,16 +48,5 @@ export async function readUser(id: string): Promise<UserModel> {
 }
 
 export async function saveDestinyManifest(manifest: Bungie.DestinyManifest) {
-  return new Promise<void>((resolve, reject) => {
-    admin
-      .database()
-      .ref('destiny')
-      .set(manifest, (e) => {
-        if (e) {
-          reject(e)
-        } else {
-          resolve()
-        }
-      })
-  })
+  return await save(`destiny`, manifest)
 }
