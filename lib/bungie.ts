@@ -84,6 +84,7 @@ export interface DestinyManifest {
         [hash: string]: {
           displayProperties: {
             name: string
+            description: string
           }
         }
       }
@@ -190,6 +191,7 @@ export async function Destiny2GetProfileCharacters(tokens: TokenSet, profile: De
 
 export interface DestinyActivity {
   name?: string
+  desciption?: string
   activityHash: string
 }
 export interface DestinyCharacterActivities {

@@ -97,12 +97,13 @@ bot.command('activities', async (ctx) => {
     const manifest = await getDestinyManifest()
     const data = await Bungie.Destiny2GetCharacterActivities(ctx.user.tokens, ctx.user.profile, ctx.user.character)
     ctx.user.activities = data.activities.data.availableActivities.map((v) => {
-      v.name =
-        manifest.jsonWorldComponentContentPaths.en.DestinyActivityDefinition[v.activityHash].displayProperties.name
+      const m = manifest.jsonWorldComponentContentPaths.en.DestinyActivityDefinition[v.activityHash].displayProperties
+      v.name = m.name
+      v.desciption = m.description
       return v
     })
 
-    await ctx.reply(ctx.user.activities.map((v) => v.name).join('\n'), options)
+    await ctx.reply(ctx.user.activities.map((v) => `${v.name} — ${v.desciption}`).join('\n'), options)
   } else {
     await replyWithLogin(ctx, options)
   }
