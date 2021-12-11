@@ -40,7 +40,7 @@ export async function getAccessToken(code: string): Promise<TokenSet> {
 }
 
 // https://github.com/Bungie-net/api/wiki/OAuth-Documentation#refreshing-the-access-token
-async function refreshAccessToken(tokens: TokenSet): Promise<TokenSet> {
+export async function refreshAccessToken(tokens: TokenSet): Promise<TokenSet> {
   if (DateTime.now().toSeconds() < tokens.created_at + tokens.expires_in) {
     return tokens
   }
@@ -61,8 +61,7 @@ async function refreshAccessToken(tokens: TokenSet): Promise<TokenSet> {
   return { ...(res.data as TokenSet), created_at: Math.floor(DateTime.now().toSeconds()) }
 }
 
-async function ask<T>(tokens: TokenSet, url: string): Promise<{ tokens: TokenSet; data: T }> {
-  tokens = await refreshAccessToken(tokens)
+async function ask<T>(tokens: TokenSet, url: string): Promise<T> {
   const res = await axios.get(url, {
     headers: {
       Authorization: `Bearer ${tokens.access_token}`,
@@ -70,7 +69,7 @@ async function ask<T>(tokens: TokenSet, url: string): Promise<{ tokens: TokenSet
     },
   })
   console.log(res.data)
-  return { tokens, data: res.data.Response }
+  return res.data.Response
 }
 
 export interface GeneralUser {
