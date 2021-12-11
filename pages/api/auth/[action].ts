@@ -109,6 +109,7 @@ export default withSentry(async (req: NextApiRequest, res: NextApiResponse<AuthR
     }
 
     const user = await readUser(state.telegram_id)
+    delete user.tokens
     return res.status(200).json({ state, user })
   }
 

@@ -8,7 +8,6 @@ enum BungieMembershipType {
 
 // https://bungie-net.github.io/multi/schema_Destiny-DestinyComponentType.html#schema_Destiny-DestinyComponentType
 enum DestinyComponentType {
-  Profiles = 100,
   Characters = 200,
   CharacterActivities = 204,
 }
@@ -126,6 +125,6 @@ export async function Destiny2GetProfile(tokens: TokenSet) {
     tokens,
     `https://www.bungie.net/Platform/Destiny2/${BungieMembershipType.TigerPsn}/Profile/${
       tokens.membership_id
-    }/?${new URLSearchParams({ components: DestinyComponentType.Characters.toString() }).toString()}`
+    }/?${new URLSearchParams({ components: [DestinyComponentType.Characters].join(',') }).toString()}`
   )
 }
