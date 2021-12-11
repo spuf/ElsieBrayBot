@@ -83,7 +83,7 @@ bot.command('whoami', async (ctx) => {
     ctx.user.profile = profiles[0]
 
     const { characters } = await Bungie.Destiny2GetProfileCharacters(ctx.user.tokens, ctx.user.profile)
-    ctx.user.character = characters.data[0]
+    ctx.user.character = characters.data
 
     await ctx.reply(`${ctx.user.bungie_username} with ${ctx.user.character.light} light`, options)
   } else {
