@@ -87,7 +87,7 @@ bot.command('whoami', async (ctx) => {
     const { characters } = await Bungie.Destiny2GetProfileCharacters(ctx.user.tokens, ctx.user.profile)
     ctx.user.character = characters.data[Object.keys(characters.data)[0]]
 
-    await ctx.reply(`${ctx.user.bungie_username} with <i>${ctx.user.character.light}<i> light`, options)
+    await ctx.reply(`${ctx.user.bungie_username} with <i>${ctx.user.character.light}</i> light`, options)
   } else {
     await replyWithLogin(ctx, options)
   }
@@ -108,7 +108,7 @@ bot.command('weekly', async (ctx) => {
     await ctx.reply(
       ctx.user.activities
         .filter((v) => v.activityHash in Bungie.ActivityHash)
-        .map((v) => `<b>${replyEscape(v.name)}</b>*\n${replyEscape(v.desciption)}`)
+        .map((v) => `<b>${replyEscape(v.name)}</b>\n${replyEscape(v.desciption)}`)
         .join('\n\n'),
       options
     )
