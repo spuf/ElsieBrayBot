@@ -20,3 +20,4 @@ npm run dev
 - https://bungie-net.github.io/multi
 - https://vercel.com
 - https://firebase.google.com
+- https://sentry.io
