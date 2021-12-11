@@ -1,6 +1,6 @@
 import { Telegraf, Markup, Context, Types } from 'telegraf'
 import { DateTime } from 'luxon'
-import { readUser, saveUser, UserModel } from '../../../lib/store'
+import { readUser, saveUser, saveDestinyManifest, UserModel } from '../../../lib/store'
 import type { NextApiRequest, NextApiResponse } from 'next'
 import * as Bungie from '../../../lib/bungie'
 import { withSentry, captureException } from '@sentry/nextjs'
@@ -119,6 +119,7 @@ export default withSentry(async (req: NextApiRequest, res: NextApiResponse<void>
         { command: 'login', description: 'Let me in' },
         { command: 'whoami', description: 'Who am I?' },
       ]),
+      Bungie.getDestinyManifest().then((v) => saveDestinyManifest(v)),
     ])
 
     return res.status(200).end()

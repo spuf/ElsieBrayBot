@@ -73,6 +73,21 @@ export async function refreshAccessToken(tokens: TokenSet): Promise<TokenSet> {
   return { ...(res.data as TokenSet), created_at: Math.floor(DateTime.now().toSeconds()) }
 }
 
+export interface DestinyManifest {}
+export async function getDestinyManifest(): Promise<DestinyManifest> {
+  try {
+    const res = await axios.get('https://www.bungie.net/Platform/Destiny2/Manifest/', {
+      headers: {
+        'X-API-Key': process.env.BUNGIE_API_KEY,
+      },
+    })
+    return res.data.Response
+  } catch (e) {
+    console.error(e.message, e.response.data ?? e.request)
+    throw e
+  }
+}
+
 async function ask<T>(tokens: TokenSet, url: string): Promise<T> {
   try {
     const res = await axios.get(url, {
