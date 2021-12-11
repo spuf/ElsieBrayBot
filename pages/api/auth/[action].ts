@@ -72,7 +72,7 @@ export default withSentry(async (req: NextApiRequest, res: NextApiResponse<AuthR
     }
 
     let tokens = await Bungie.getAccessToken(req.query.code)
-    const profile = await Bungie.getBungieNetUserById(tokens)
+    const profile = await Bungie.UserGetBungieNetUserById(tokens)
 
     const state = {
       telegram_id: payload.telegram_id,
