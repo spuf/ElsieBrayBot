@@ -72,18 +72,18 @@ export default withSentry(async (req: NextApiRequest, res: NextApiResponse<AuthR
     }
 
     let tokens = await Bungie.getAccessToken(req.query.code)
-    const profile = await Bungie.UserGetBungieNetUserById(tokens)
+    const bungie = await Bungie.UserGetBungieNetUserById(tokens)
 
     const state = {
       telegram_id: payload.telegram_id,
       telegram_username: payload.telegram_username,
-      bungie_id: profile.membershipId,
-      bungie_username: profile.uniqueName,
+      bungie_id: bungie.membershipId,
+      bungie_username: bungie.uniqueName,
     }
     const jwt_expires_in = 60 * 60 * 24 * 7
     const jwt = await sign(state, DateTime.now().plus({ seconds: jwt_expires_in }).toSeconds())
 
-    await saveUser(state.telegram_id, { ...state, tokens, profile })
+    await saveUser(state.telegram_id, { ...state, tokens, bungie })
 
     return res.status(200).json({
       message: `Hello, ${state.bungie_username}!`,

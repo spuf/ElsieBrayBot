@@ -10,8 +10,9 @@ admin.initializeApp({
 
 export interface UserModel extends State {
   tokens?: Bungie.TokenSet
-  profile?: Bungie.GeneralUser
+  bungie?: Bungie.GeneralUser
   characters?: Bungie.DestinyProfileResponse
+  linkedProfiles?: Bungie.DestinyLinkedProfilesResponse
 }
 
 export async function saveUser(id: string, data: UserModel) {
