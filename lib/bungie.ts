@@ -17,6 +17,11 @@ enum Locale {
   en = 'en',
 }
 
+export enum ActivityHash {
+  NightfallGrandmaster = 2416314393,
+  IronBanner = 1683791010,
+}
+
 // https://github.com/Bungie-net/api/wiki/OAuth-Documentation#authorization-request
 export function generateAuthUrl(state: string): string {
   const url = new URL('https://www.bungie.net/en/oauth/authorize')

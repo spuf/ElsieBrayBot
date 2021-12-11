@@ -91,7 +91,7 @@ bot.command('whoami', async (ctx) => {
   }
 })
 
-bot.command('activities', async (ctx) => {
+bot.command('weekly', async (ctx) => {
   const options = replyOptions(ctx)
   if (ctx.user) {
     const manifest = await getDestinyManifest()
@@ -103,7 +103,13 @@ bot.command('activities', async (ctx) => {
       return v
     })
 
-    await ctx.reply(ctx.user.activities.map((v) => `${v.name} — ${v.desciption}`).join('\n'), options)
+    await ctx.reply(
+      ctx.user.activities
+        .filter((v) => v.activityHash in Bungie.ActivityHash)
+        .map((v) => `${v.name} — ${v.desciption}`)
+        .join('\n'),
+      options
+    )
   } else {
     await replyWithLogin(ctx, options)
   }
@@ -125,7 +131,7 @@ export default withSentry(async (req: NextApiRequest, res: NextApiResponse<void>
           { command: 'poll', description: 'When are you ready to play?' },
           { command: 'login', description: 'Let me in' },
           { command: 'whoami', description: 'Who am I?' },
-          { command: 'activities', description: 'What is going on' },
+          { command: 'weekly', description: 'What is going on' },
         ]),
         Bungie.getDestinyManifest().then((v) => saveDestinyManifest(v)),
       ])
