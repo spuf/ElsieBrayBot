@@ -76,10 +76,10 @@ bot.command('whoami', async (ctx) => {
   }
 })
 
-bot.command('profile', async (ctx) => {
+bot.command('linked', async (ctx) => {
   const options = replyOptions(ctx)
   if (ctx.user) {
-    ctx.user.characters = await Bungie.Destiny2GetProfile(ctx.user.tokens)
+    ctx.user.linkedProfiles = await Bungie.Destiny2GetLinkedProfiles(ctx.user.tokens)
     await ctx.reply('OK', options)
   } else {
     await replyWithLogin(ctx, options)
