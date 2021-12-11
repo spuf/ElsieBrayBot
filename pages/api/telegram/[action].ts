@@ -122,9 +122,11 @@ export default withSentry(async (req: NextApiRequest, res: NextApiResponse<void>
       return res.status(405).end()
     }
 
-    await bot.handleUpdate(req.body)
-
-    return res.status(200).end()
+    try {
+      await bot.handleUpdate(req.body)
+    } finally {
+      return res.status(200).end()
+    }
   }
 
   return res.status(404).end()
