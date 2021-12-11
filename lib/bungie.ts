@@ -84,7 +84,7 @@ async function ask<T>(tokens: TokenSet, url: string): Promise<T> {
     console.log(res.data)
     return res.data.Response
   } catch (e) {
-    console.error(e)
+    console.error(e.message, e.response.data ?? e.request)
     throw e
   }
 }
@@ -110,6 +110,6 @@ export async function Destiny2GetProfile(tokens: TokenSet) {
     tokens,
     `https://www.bungie.net/Platform/Destiny2/${BungieMembershipType.TigerPsn}/Profile/${
       tokens.membership_id
-    }/?components=${[DestinyComponentType.Profiles, DestinyComponentType.Characters].join(',')}`
+    }/?${new URLSearchParams({ components: DestinyComponentType.Characters.toString() }).toString()}`
   )
 }
