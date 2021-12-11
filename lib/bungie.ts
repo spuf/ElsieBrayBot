@@ -97,17 +97,17 @@ export async function getDestinyManifest(): Promise<DestinyManifest> {
     const data = res.data.Response
     data.jsonWorldComponentContentPaths.en.DestinyActivityDefinition = (
       await axios.get(data.jsonWorldComponentContentPaths.en.DestinyActivityDefinition, {
-        baseURL: 'https://www.bungie.net/Platform',
+        baseURL: 'https://www.bungie.net',
       })
     ).data
     data.jsonWorldComponentContentPaths.en.DestinyActivityModeDefinition = (
       await axios.get(data.jsonWorldComponentContentPaths.en.DestinyActivityModeDefinition, {
-        baseURL: 'https://www.bungie.net/Platform',
+        baseURL: 'https://www.bungie.net',
       })
     ).data
     data.jsonWorldComponentContentPaths.en.DestinyActivityTypeDefinition = (
       await axios.get(data.jsonWorldComponentContentPaths.en.DestinyActivityTypeDefinition, {
-        baseURL: 'https://www.bungie.net/Platform',
+        baseURL: 'https://www.bungie.net',
       })
     ).data
     return data
