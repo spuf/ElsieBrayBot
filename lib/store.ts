@@ -28,7 +28,7 @@ export interface UserModel extends State {
   bungie?: Bungie.GeneralUser
   profile?: Bungie.DestinyProfile
   character?: Bungie.DestinyCharacter
-  data?: Bungie.DestinyCharacterActivities
+  activities?: Bungie.DestinyActivity[]
 }
 
 export async function saveUser(id: string, data: UserModel) {
@@ -48,5 +48,10 @@ export async function readUser(id: string): Promise<UserModel> {
 }
 
 export async function saveDestinyManifest(manifest: Bungie.DestinyManifest) {
-  return await save(`destiny`, manifest)
+  return await save('destiny', manifest)
+}
+
+export async function getDestinyManifest(): Promise<Bungie.DestinyManifest> {
+  const snapshot = await admin.database().ref('destiny').get()
+  return snapshot.val()
 }

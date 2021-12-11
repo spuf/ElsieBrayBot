@@ -80,8 +80,14 @@ export async function refreshAccessToken(tokens: TokenSet): Promise<TokenSet> {
 export interface DestinyManifest {
   jsonWorldComponentContentPaths: {
     [locale in Locale]: {
-      DestinyActivityDefinition: {},
-      DestinyActivityModeDefinition: {},
+      DestinyActivityDefinition: {
+        [hash: string]: {
+          displayProperties: {
+            name: string
+          }
+        }
+      }
+      DestinyActivityModeDefinition: {}
       DestinyActivityTypeDefinition: {}
     }
   }
@@ -182,7 +188,17 @@ export async function Destiny2GetProfileCharacters(tokens: TokenSet, profile: De
   )
 }
 
-export interface DestinyCharacterActivities {}
+export interface DestinyActivity {
+  name?: string
+  activityHash: string
+}
+export interface DestinyCharacterActivities {
+  activities: {
+    data: {
+      availableActivities: DestinyActivity[]
+    }
+  }
+}
 
 // https://bungie-net.github.io/multi/operation_get_Destiny2-GetProfile.html#operation_get_Destiny2-GetProfile
 export async function Destiny2GetCharacterActivities(
