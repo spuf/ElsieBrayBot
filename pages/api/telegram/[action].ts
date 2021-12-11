@@ -53,20 +53,36 @@ const loginButton = Markup.button.login('Let me in', new URL('/guardian', proces
 bot.command('login', (ctx) =>
   ctx.reply('Many Guardians fell. Strong ones. But you made it here.', Markup.inlineKeyboard([loginButton]))
 )
-
-bot.command('whoami', async (ctx) => {
+const replyOptions = (ctx: CustomContext) => {
   const options: Types.ExtraReplyMessage = {}
   if (ctx.message.chat.type !== 'private') {
     options.reply_to_message_id = ctx.message.message_id
   }
+  return options
+}
+const replyWithLogin = (ctx: CustomContext, options: Types.ExtraReplyMessage) => {
+  options.reply_markup = Markup.inlineKeyboard([loginButton]).reply_markup
+  return ctx.reply("I wasn't talking to you, little light.", options)
+}
 
+bot.command('whoami', async (ctx) => {
+  const options = replyOptions(ctx)
   if (ctx.user) {
-    ctx.user.profile = await Bungie.getBungieNetUserById(ctx.user.tokens)
+    ctx.user.profile = await Bungie.UserGetBungieNetUserById(ctx.user.tokens)
     ctx.user.bungie_username = ctx.user.profile.uniqueName
     await ctx.reply(ctx.user.bungie_username, options)
   } else {
-    options.reply_markup = Markup.inlineKeyboard([loginButton]).reply_markup
-    await ctx.reply("I wasn't talking to you, little light.", options)
+    await replyWithLogin(ctx, options)
+  }
+})
+
+bot.command('profile', async (ctx) => {
+  const options = replyOptions(ctx)
+  if (ctx.user) {
+    ctx.user.characters = await Bungie.Destiny2GetProfile(ctx.user.tokens)
+    await ctx.reply('OK', options)
+  } else {
+    await replyWithLogin(ctx, options)
   }
 })
 

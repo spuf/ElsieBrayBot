@@ -1,6 +1,18 @@
 import axios from 'axios'
 import { DateTime } from 'luxon'
 
+// https://bungie-net.github.io/multi/schema_BungieMembershipType.html#schema_BungieMembershipType
+enum BungieMembershipType {
+  TigerPsn = 2,
+}
+
+// https://bungie-net.github.io/multi/schema_Destiny-DestinyComponentType.html#schema_Destiny-DestinyComponentType
+enum DestinyComponentType {
+  Profiles = 100,
+  Characters = 200,
+  CharacterActivities = 204,
+}
+
 // https://github.com/Bungie-net/api/wiki/OAuth-Documentation#authorization-request
 export function generateAuthUrl(state: string): string {
   const url = new URL('https://www.bungie.net/en/oauth/authorize')
@@ -78,9 +90,21 @@ export interface GeneralUser {
 }
 
 // https://bungie-net.github.io/multi/operation_get_User-GetBungieNetUserById.html#operation_get_User-GetBungieNetUserById
-export async function getBungieNetUserById(tokens: TokenSet) {
+export async function UserGetBungieNetUserById(tokens: TokenSet) {
   return await ask<GeneralUser>(
     tokens,
     `https://www.bungie.net/Platform/User/GetBungieNetUserById/${tokens.membership_id}/`
+  )
+}
+
+export interface DestinyProfileResponse {}
+
+// https://bungie-net.github.io/multi/operation_get_Destiny2-GetProfile.html#operation_get_Destiny2-GetProfile
+export async function Destiny2GetProfile(tokens: TokenSet) {
+  return await ask<DestinyProfileResponse>(
+    tokens,
+    `https://www.bungie.net/Platform/Destiny2/${BungieMembershipType.TigerPsn}/Profile/${
+      tokens.membership_id
+    }/?components=${[DestinyComponentType.Profiles, DestinyComponentType.Characters].join(',')}`
   )
 }
