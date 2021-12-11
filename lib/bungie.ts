@@ -80,7 +80,9 @@ export async function refreshAccessToken(tokens: TokenSet): Promise<TokenSet> {
 export interface DestinyManifest {
   jsonWorldComponentContentPaths: {
     [locale in Locale]: {
-      DestinyActivityDefinition: {}
+      DestinyActivityDefinition: {},
+      DestinyActivityModeDefinition: {},
+      DestinyActivityTypeDefinition: {}
     }
   }
   jsonWorldContentPaths: { [locale in Locale]: {} }
@@ -98,7 +100,17 @@ export async function getDestinyManifest(): Promise<DestinyManifest> {
         baseURL: 'https://www.bungie.net/Platform',
       })
     ).data
-    return res.data.Response
+    data.jsonWorldComponentContentPaths.en.DestinyActivityModeDefinition = (
+      await axios.get(data.jsonWorldComponentContentPaths.en.DestinyActivityModeDefinition, {
+        baseURL: 'https://www.bungie.net/Platform',
+      })
+    ).data
+    data.jsonWorldComponentContentPaths.en.DestinyActivityTypeDefinition = (
+      await axios.get(data.jsonWorldComponentContentPaths.en.DestinyActivityTypeDefinition, {
+        baseURL: 'https://www.bungie.net/Platform',
+      })
+    ).data
+    return data
   } catch (e) {
     console.error(e.message, e.response.data ?? e.request)
     throw e
