@@ -1,17 +1,34 @@
-import { Telegraf, Markup } from 'telegraf'
+import { Telegraf, Markup, Context, Types } from 'telegraf'
 import { DateTime } from 'luxon'
-import { readUser, saveUser } from '../../../lib/store'
+import { readUser, saveUser, UserModel } from '../../../lib/store'
 import type { NextApiRequest, NextApiResponse } from 'next'
-import { ExtraReplyMessage } from 'telegraf/typings/telegram-types'
 import * as Bungie from '../../../lib/bungie'
 import { withSentry } from '@sentry/nextjs'
 
-const bot = new Telegraf(process.env.BOT_TOKEN, {
+interface ContextWithUser extends Context {
+  user?: UserModel
+}
+
+const bot = new Telegraf<ContextWithUser>(process.env.BOT_TOKEN, {
   telegram: { webhookReply: true },
 })
-bot.use(Telegraf.log())
 
-bot.start((ctx) => ctx.reply(`I don't even have time to explain why I don't have time to explain.`))
+bot.use(Telegraf.log())
+bot.use(async (ctx, next) => {
+  const id = ctx.from.id.toString()
+  ctx.user = await readUser(id)
+  if (ctx.user) {
+    ctx.user.tokens = await Bungie.refreshAccessToken(ctx.user.tokens)
+    await next()
+    await saveUser(id, ctx.user)
+  } else {
+    await next()
+  }
+})
+
+bot.start((ctx) =>
+  ctx.reply(`I don't even have time to explain why I don't have time to explain.`, Markup.removeKeyboard())
+)
 
 const zoneNames = {
   'Europe/Moscow': 'MSK',
@@ -40,32 +57,24 @@ bot.command('login', (ctx) =>
 )
 
 bot.command('whoami', async (ctx) => {
-  const user = await readUser(ctx.from.id.toString())
-  if (user) {
-    const answer = await Bungie.getBungieNetUserById(user.tokens)
-    user.tokens = answer.tokens
-
-    user.bungie_id = answer.data.membershipId
-    user.bungie_username = answer.data.uniqueName
-    user.user = answer.data
-
-    await saveUser(ctx.from.id.toString(), user)
-  }
-
-  const text = user?.bungie_username || 'Who knows...'
-  const options: ExtraReplyMessage = {}
+  const options: Types.ExtraReplyMessage = {}
   if (ctx.message.chat.type !== 'private') {
     options.reply_to_message_id = ctx.message.message_id
   }
-  return await ctx.reply(text, options)
+
+  if (ctx.user) {
+    ctx.user.profile = await Bungie.getBungieNetUserById(ctx.user.tokens)
+    ctx.user.bungie_username = ctx.user.profile.uniqueName
+    await ctx.reply(ctx.user.bungie_username, options)
+  } else {
+    await ctx.reply('Who knows...', options)
+  }
 })
 
 bot.command('debug', async (ctx) => {
-  if (ctx.message.chat.type !== 'private') {
-    return
+  if (ctx.message.chat.type === 'private') {
+    await ctx.reply('```json\n' + JSON.stringify(ctx.user, null, 2) + '\n```', { parse_mode: 'MarkdownV2' })
   }
-  const user = await readUser(ctx.from.id.toString())
-  return await ctx.reply('```json\n' + JSON.stringify(user, null, 2) + '\n```', { parse_mode: 'MarkdownV2' })
 })
 
 export default withSentry(async (req: NextApiRequest, res: NextApiResponse<void>) => {
@@ -84,6 +93,9 @@ export default withSentry(async (req: NextApiRequest, res: NextApiResponse<void>
         { command: 'login', description: 'Let me in' },
         { command: 'whoami', description: 'Who am I?' },
       ]),
+      bot.telegram.setMyCommands([{ command: 'debug', description: 'Show my data' }], {
+        scope: { type: 'all_private_chats' },
+      }),
     ])
 
     return res.status(200).end()
