@@ -74,14 +74,19 @@ export async function refreshAccessToken(tokens: TokenSet): Promise<TokenSet> {
 }
 
 async function ask<T>(tokens: TokenSet, url: string): Promise<T> {
-  const res = await axios.get(url, {
-    headers: {
-      Authorization: `Bearer ${tokens.access_token}`,
-      'X-API-Key': process.env.BUNGIE_API_KEY,
-    },
-  })
-  console.log(res.data)
-  return res.data.Response
+  try {
+    const res = await axios.get(url, {
+      headers: {
+        Authorization: `Bearer ${tokens.access_token}`,
+        'X-API-Key': process.env.BUNGIE_API_KEY,
+      },
+    })
+    console.log(res.data)
+    return res.data.Response
+  } catch (e) {
+    console.error(e)
+    throw e
+  }
 }
 
 export interface GeneralUser {
