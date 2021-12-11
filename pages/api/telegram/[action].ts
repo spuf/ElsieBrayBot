@@ -16,7 +16,7 @@ const bot = new Telegraf<CustomContext>(process.env.BOT_TOKEN, {
 bot.use(Telegraf.log())
 bot.use(async (ctx, next) => {
   const id = ctx.from?.id?.toString()
-  ctx.user = await readUser(id)
+  ctx.user = id ? await readUser(id) : null
   if (ctx.user) {
     ctx.user.tokens = await Bungie.refreshAccessToken(ctx.user.tokens)
     await next()
