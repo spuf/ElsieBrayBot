@@ -42,3 +42,18 @@ export async function readUser(id: string): Promise<UserModel> {
   }
   return await decrypt(value)
 }
+
+export async function saveDestinyManifest(manifest: Bungie.DestinyManifest) {
+  return new Promise<void>((resolve, reject) => {
+    admin
+      .database()
+      .ref('destiny')
+      .set(manifest, (e) => {
+        if (e) {
+          reject(e)
+        } else {
+          resolve()
+        }
+      })
+  })
+}
