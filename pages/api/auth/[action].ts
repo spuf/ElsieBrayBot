@@ -4,6 +4,7 @@ import { sign, verify } from '../../../lib/crypt'
 import { saveUser } from '../../../lib/store'
 import * as Bungie from '../../../lib/bungie'
 import type { NextApiRequest, NextApiResponse } from 'next'
+import { withSentry } from '@sentry/nextjs'
 
 export interface State {
   telegram_id: string
@@ -19,7 +20,7 @@ export interface AuthResponse {
   state?: State
 }
 
-export default async function handler(req: NextApiRequest, res: NextApiResponse<AuthResponse>) {
+export default withSentry(async (req: NextApiRequest, res: NextApiResponse<AuthResponse>) => {
   if (req.query.action === 'telegram') {
     if (req.method !== 'POST') {
       return res.status(405).end()
@@ -111,4 +112,4 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse<
   }
 
   return res.status(404).end()
-}
+})
