@@ -12,6 +12,7 @@
     "test": "npm run fmt && npm run check && npm run lint"
   },
   "dependencies": {
+    "@sentry/nextjs": "^6.16.1",
     "axios": "^0.24.0",
     "firebase-admin": "^10.0.0",
     "jose": "^4.3.7",

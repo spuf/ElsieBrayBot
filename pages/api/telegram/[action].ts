@@ -4,6 +4,7 @@ import { readUser, saveUser } from '../../../lib/store'
 import type { NextApiRequest, NextApiResponse } from 'next'
 import { ExtraReplyMessage } from 'telegraf/typings/telegram-types'
 import * as Bungie from '../../../lib/bungie'
+import { withSentry } from '@sentry/nextjs'
 
 const bot = new Telegraf(process.env.BOT_TOKEN, {
   telegram: { webhookReply: true },
@@ -67,7 +68,7 @@ bot.command('debug', async (ctx) => {
   return await ctx.reply('```json\n' + JSON.stringify(user, null, 2) + '\n```', { parse_mode: 'MarkdownV2' })
 })
 
-export default async function handler(req: NextApiRequest, res: NextApiResponse<void>) {
+export default withSentry(async (req: NextApiRequest, res: NextApiResponse<void>) => {
   if (req.query.action === process.env.BOT_CRON_ACTION) {
     if (req.method !== 'POST') {
       return res.status(405).end()
@@ -99,4 +100,4 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse<
   }
 
   return res.status(404).end()
-}
+})
