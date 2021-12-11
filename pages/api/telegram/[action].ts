@@ -3,7 +3,7 @@ import { DateTime } from 'luxon'
 import { readUser, saveUser, UserModel } from '../../../lib/store'
 import type { NextApiRequest, NextApiResponse } from 'next'
 import * as Bungie from '../../../lib/bungie'
-import { withSentry } from '@sentry/nextjs'
+import { withSentry, captureException } from '@sentry/nextjs'
 
 interface CustomContext extends Context {
   user?: UserModel
@@ -123,6 +123,9 @@ export default withSentry(async (req: NextApiRequest, res: NextApiResponse<void>
 
     try {
       await bot.handleUpdate(req.body)
+    } catch (e) {
+      captureException(e)
+      console.error(e)
     } finally {
       return res.status(200).end()
     }
