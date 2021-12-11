@@ -102,13 +102,19 @@ export async function UserGetBungieNetUserById(tokens: TokenSet) {
   )
 }
 
-export interface DestinyLinkedProfilesResponse {}
+export interface DestinyProfile {
+  membershipId: string
+  membershipType: BungieMembershipType
+}
+interface DestinyLinkedProfilesResponse {
+  profiles: DestinyProfile[]
+}
 
 // https://bungie-net.github.io/multi/operation_get_Destiny2-GetProfile.html#operation_get_Destiny2-GetProfile
 export async function Destiny2GetLinkedProfiles(tokens: TokenSet) {
   return await ask<DestinyLinkedProfilesResponse>(
     tokens,
-    `https://www.bungie.net/Platform/Destiny2/${BungieMembershipType.TigerPsn}/Profile/${tokens.membership_id}/LinkedProfiles/?getAllMemberships=true`
+    `https://www.bungie.net/Platform/Destiny2/${BungieMembershipType.TigerPsn}/Profile/${tokens.membership_id}/LinkedProfiles/`
   )
 }
 
