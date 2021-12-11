@@ -70,20 +70,24 @@ bot.command('whoami', async (ctx) => {
   if (ctx.user) {
     ctx.user.bungie = await Bungie.UserGetBungieNetUserById(ctx.user.tokens)
     ctx.user.bungie_username = ctx.user.bungie.uniqueName
-    await ctx.reply(ctx.user.bungie_username, options)
+
+    const { profiles } = await Bungie.Destiny2GetLinkedProfiles(ctx.user.tokens)
+    ctx.user.profile = profiles[0]
+
+    const { characters } = await Bungie.Destiny2GetProfileCharacters(ctx.user.tokens, ctx.user.profile)
+    ctx.user.character = characters[0].data
+
+    await ctx.reply(`${ctx.user.bungie_username} with ${ctx.user.character.light} light`, options)
   } else {
     await replyWithLogin(ctx, options)
   }
 })
 
-bot.command('linked', async (ctx) => {
+bot.command('demo', async (ctx) => {
   const options = replyOptions(ctx)
   if (ctx.user) {
-    const { profiles } = await Bungie.Destiny2GetLinkedProfiles(ctx.user.tokens)
-    ctx.user.profile = profiles[0]
-
-    const characters = await Bungie.Destiny2GetProfile(ctx.user.tokens, ctx.user.profile)
-    ctx.user.characters = characters
+    const data = await Bungie.Destiny2GetCharacterActivities(ctx.user.tokens, ctx.user.profile, ctx.user.character)
+    ctx.user.data = data
 
     await ctx.reply('OK', options)
   } else {

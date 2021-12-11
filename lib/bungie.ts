@@ -4,7 +4,7 @@ import { DateTime } from 'luxon'
 // https://bungie-net.github.io/multi/schema_BungieMembershipType.html#schema_BungieMembershipType
 enum BungieMembershipType {
   TigerPsn = 2,
-  All= -1
+  All = -1,
 }
 
 // https://bungie-net.github.io/multi/schema_Destiny-DestinyComponentType.html#schema_Destiny-DestinyComponentType
@@ -118,14 +118,38 @@ export async function Destiny2GetLinkedProfiles(tokens: TokenSet) {
   )
 }
 
-export interface DestinyProfileResponse {}
+export interface DestinyCharacter {
+  characterId: string
+  light: number
+}
+export interface DestinyProfileCharacters {
+  characters?: {
+    data: DestinyCharacter
+  }[]
+}
 
 // https://bungie-net.github.io/multi/operation_get_Destiny2-GetProfile.html#operation_get_Destiny2-GetProfile
-export async function Destiny2GetProfile(tokens: TokenSet, profile: DestinyProfile) {
-  return await ask<DestinyProfileResponse>(
+export async function Destiny2GetProfileCharacters(tokens: TokenSet, profile: DestinyProfile) {
+  return await ask<DestinyProfileCharacters>(
     tokens,
     `https://www.bungie.net/Platform/Destiny2/${profile.membershipType}/Profile/${
       profile.membershipId
     }/?${new URLSearchParams({ components: [DestinyComponentType.Characters].join(',') }).toString()}`
+  )
+}
+
+export interface DestinyCharacterActivities {}
+
+// https://bungie-net.github.io/multi/operation_get_Destiny2-GetProfile.html#operation_get_Destiny2-GetProfile
+export async function Destiny2GetCharacterActivities(
+  tokens: TokenSet,
+  profile: DestinyProfile,
+  character: DestinyCharacter
+) {
+  return await ask<DestinyCharacterActivities>(
+    tokens,
+    `https://www.bungie.net/Platform/Destiny2/${profile.membershipType}/Profile/${profile.membershipId}/Character/${
+      character.characterId
+    }/?${new URLSearchParams({ components: [DestinyComponentType.CharacterActivities].join(',') }).toString()}`
   )
 }

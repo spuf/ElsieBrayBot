@@ -12,7 +12,8 @@ export interface UserModel extends State {
   tokens?: Bungie.TokenSet
   bungie?: Bungie.GeneralUser
   profile?: Bungie.DestinyProfile
-  characters?: Bungie.DestinyProfileResponse
+  character?: Bungie.DestinyCharacter
+  data?: Bungie.DestinyCharacterActivities
 }
 
 export async function saveUser(id: string, data: UserModel) {
