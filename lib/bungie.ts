@@ -124,7 +124,7 @@ export interface DestinyCharacter {
 }
 export interface DestinyProfileCharacters {
   characters: {
-    data: DestinyCharacter
+    data: {[characterId: string]: DestinyCharacter}
   }
 }
 
