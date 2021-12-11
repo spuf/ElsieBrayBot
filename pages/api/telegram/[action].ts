@@ -49,11 +49,9 @@ bot.command('poll', (ctx) => {
   })
 })
 
+const loginButton = Markup.button.login('Let me in', new URL('/guardian', process.env.BASE_URL).toString())
 bot.command('login', (ctx) =>
-  ctx.reply(
-    'Many Guardians fell. Strong ones. But you made it here.',
-    Markup.inlineKeyboard([Markup.button.login('Let me in', new URL('/guardian', process.env.BASE_URL).toString())])
-  )
+  ctx.reply('Many Guardians fell. Strong ones. But you made it here.', Markup.inlineKeyboard([loginButton]))
 )
 
 bot.command('whoami', async (ctx) => {
@@ -67,7 +65,8 @@ bot.command('whoami', async (ctx) => {
     ctx.user.bungie_username = ctx.user.profile.uniqueName
     await ctx.reply(ctx.user.bungie_username, options)
   } else {
-    await ctx.reply('Who knows...', options)
+    options.reply_markup = Markup.inlineKeyboard([loginButton]).reply_markup
+    await ctx.reply("I wasn't talking to you, little light.", options)
   }
 })
 

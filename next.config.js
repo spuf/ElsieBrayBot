@@ -10,4 +10,4 @@ const nextConfig = {
 }
 
 // @ts-ignore
-module.exports = withSentryConfig(nextConfig)
+module.exports = withSentryConfig(nextConfig, { silent: true })
