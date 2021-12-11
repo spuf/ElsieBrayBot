@@ -15,6 +15,14 @@ const bot = new Telegraf<CustomContext>(process.env.BOT_TOKEN, {
 
 bot.use(Telegraf.log())
 bot.use(async (ctx, next) => {
+  try {
+    await next()
+  } catch (e) {
+    captureException(e)
+    await ctx.reply('Error!')
+  }
+})
+bot.use(async (ctx, next) => {
   const id = ctx.from?.id?.toString()
   ctx.user = id ? await readUser(id) : null
   if (ctx.user) {
@@ -121,14 +129,8 @@ export default withSentry(async (req: NextApiRequest, res: NextApiResponse<void>
       return res.status(405).end()
     }
 
-    try {
-      await bot.handleUpdate(req.body)
-    } catch (e) {
-      captureException(e)
-      console.error(e)
-    } finally {
-      return res.status(200).end()
-    }
+    await bot.handleUpdate(req.body)
+    return res.status(200).end()
   }
 
   return res.status(404).end()
