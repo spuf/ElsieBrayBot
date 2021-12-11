@@ -5,11 +5,11 @@ import type { NextApiRequest, NextApiResponse } from 'next'
 import * as Bungie from '../../../lib/bungie'
 import { withSentry } from '@sentry/nextjs'
 
-interface ContextWithUser extends Context {
+interface CustomContext extends Context {
   user?: UserModel
 }
 
-const bot = new Telegraf<ContextWithUser>(process.env.BOT_TOKEN, {
+const bot = new Telegraf<CustomContext>(process.env.BOT_TOKEN, {
   telegram: { webhookReply: true },
 })
 
@@ -76,6 +76,12 @@ bot.command('debug', async (ctx) => {
   }
 })
 
+const commands = [
+  { command: 'start', description: 'System wipe' },
+  { command: 'poll', description: 'When are you ready to play?' },
+  { command: 'login', description: 'Let me in' },
+  { command: 'whoami', description: 'Who am I?' },
+]
 export default withSentry(async (req: NextApiRequest, res: NextApiResponse<void>) => {
   if (req.query.action === process.env.BOT_CRON_ACTION) {
     if (req.method !== 'POST') {
@@ -86,13 +92,8 @@ export default withSentry(async (req: NextApiRequest, res: NextApiResponse<void>
       bot.telegram.setWebhook(process.env.BOT_BASE_URL + process.env.BOT_HOOK_ACTION, {
         max_connections: 1,
       }),
-      bot.telegram.setMyCommands([
-        { command: 'start', description: 'System wipe' },
-        { command: 'poll', description: 'When are you ready to play?' },
-        { command: 'login', description: 'Let me in' },
-        { command: 'whoami', description: 'Who am I?' },
-      ]),
-      bot.telegram.setMyCommands([{ command: 'debug', description: 'Show my data' }], {
+      bot.telegram.setMyCommands(commands),
+      bot.telegram.setMyCommands(commands.concat([{ command: 'debug', description: 'Show my data' }]), {
         scope: { type: 'all_private_chats' },
       }),
     ])
