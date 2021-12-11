@@ -82,7 +82,7 @@ bot.command('linked', async (ctx) => {
     const { profiles } = await Bungie.Destiny2GetLinkedProfiles(ctx.user.tokens)
     ctx.user.profile = profiles[0]
 
-    const characters = await Bungie.Destiny2GetProfile(ctx.user.tokens)
+    const characters = await Bungie.Destiny2GetProfile(ctx.user.tokens, ctx.user.profile)
     ctx.user.characters = characters
 
     await ctx.reply('OK', options)
