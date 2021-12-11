@@ -123,9 +123,9 @@ export interface DestinyCharacter {
   light: number
 }
 export interface DestinyProfileCharacters {
-  characters?: {
-    data: DestinyCharacter
-  }[]
+  characters: {
+    data: DestinyCharacter[]
+  }
 }
 
 // https://bungie-net.github.io/multi/operation_get_Destiny2-GetProfile.html#operation_get_Destiny2-GetProfile
