@@ -1,6 +1,6 @@
 import { Telegraf, Markup, Context, Types } from 'telegraf'
 import { DateTime } from 'luxon'
-import { readUser, saveUser, saveDestinyManifest, UserModel } from '../../../lib/store'
+import { readUser, saveUser, saveDestinyManifest, getDestinyManifest, UserModel } from '../../../lib/store'
 import type { NextApiRequest, NextApiResponse } from 'next'
 import * as Bungie from '../../../lib/bungie'
 import { withSentry, captureException } from '@sentry/nextjs'
@@ -91,13 +91,18 @@ bot.command('whoami', async (ctx) => {
   }
 })
 
-bot.command('demo', async (ctx) => {
+bot.command('activities', async (ctx) => {
   const options = replyOptions(ctx)
   if (ctx.user) {
+    const manifest = await getDestinyManifest()
     const data = await Bungie.Destiny2GetCharacterActivities(ctx.user.tokens, ctx.user.profile, ctx.user.character)
-    ctx.user.data = data
+    ctx.user.activities = data.activities.data.availableActivities.map((v) => {
+      v.name =
+        manifest.jsonWorldComponentContentPaths.en.DestinyActivityDefinition[v.activityHash].displayProperties.name
+      return v
+    })
 
-    await ctx.reply('OK', options)
+    await ctx.reply(ctx.user.activities.map((v) => v.name).join('\n'), options)
   } else {
     await replyWithLogin(ctx, options)
   }
@@ -109,19 +114,24 @@ export default withSentry(async (req: NextApiRequest, res: NextApiResponse<void>
       return res.status(405).end()
     }
 
-    await Promise.all([
-      bot.telegram.setWebhook(process.env.BOT_BASE_URL + process.env.BOT_HOOK_ACTION, {
-        max_connections: 1,
-      }),
-      bot.telegram.setMyCommands([
-        { command: 'start', description: 'System wipe' },
-        { command: 'poll', description: 'When are you ready to play?' },
-        { command: 'login', description: 'Let me in' },
-        { command: 'whoami', description: 'Who am I?' },
-      ]),
-      Bungie.getDestinyManifest().then((v) => saveDestinyManifest(v)),
-    ])
-
+    try {
+      await Promise.all([
+        bot.telegram.setWebhook(process.env.BOT_BASE_URL + process.env.BOT_HOOK_ACTION, {
+          max_connections: 1,
+        }),
+        bot.telegram.setMyCommands([
+          { command: 'start', description: 'System wipe' },
+          { command: 'poll', description: 'When are you ready to play?' },
+          { command: 'login', description: 'Let me in' },
+          { command: 'whoami', description: 'Who am I?' },
+          { command: 'activities', description: 'What is going on' },
+        ]),
+        Bungie.getDestinyManifest().then((v) => saveDestinyManifest(v)),
+      ])
+    } catch (e) {
+      captureException(e)
+      throw e
+    }
     return res.status(200).end()
   }
 
