@@ -59,17 +59,17 @@ export const getServerSideProps: GetServerSideProps<AuthResponse> = async (ctx) 
   let props: AuthResponse = {}
   if (query.id && query.hash) {
     url.pathname = '/api/auth/telegram'
-    const res = await axios.get(url.toString())
+    const res = await axios.post(url.toString())
     props = res.data
   } else if (query.state) {
     url.pathname = '/api/auth/bungie'
-    const res = await axios.get(url.toString())
+    const res = await axios.post(url.toString())
     props = res.data
   } else if (cookies.token) {
     url.pathname = '/api/auth/check'
     url.searchParams.set('token', cookies.token)
     try {
-      const res = await axios.get(url.toString())
+      const res = await axios.post(url.toString())
       props = res.data
     } catch (e) {
       console.error(e)

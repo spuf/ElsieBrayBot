@@ -67,13 +67,13 @@ bot.command('debug', async (ctx) => {
   return await ctx.reply('```json\n' + JSON.stringify(user, null, 2) + '\n```', { parse_mode: 'MarkdownV2' })
 })
 
-export default function handler(req: NextApiRequest, res: NextApiResponse<void>) {
+export default async function handler(req: NextApiRequest, res: NextApiResponse<void>) {
   if (req.query.action === process.env.BOT_CRON_ACTION) {
     if (req.method !== 'POST') {
       return res.status(405).end()
     }
 
-    return Promise.all([
+    await Promise.all([
       bot.telegram.setWebhook(process.env.BOT_BASE_URL + process.env.BOT_HOOK_ACTION, {
         max_connections: 1,
       }),
@@ -83,14 +83,19 @@ export default function handler(req: NextApiRequest, res: NextApiResponse<void>)
         { command: 'login', description: 'Let me in' },
         { command: 'whoami', description: 'Who am I?' },
       ]),
-    ]).then(() => res.status(200).end())
+    ])
+
+    return res.status(200).end()
   }
 
   if (req.query.action === process.env.BOT_HOOK_ACTION) {
     if (req.method !== 'POST') {
       return res.status(405).end()
     }
-    return bot.handleUpdate(req.body).finally(() => res.status(200).end())
+
+    await bot.handleUpdate(req.body)
+
+    return res.status(200).end()
   }
 
   return res.status(404).end()
