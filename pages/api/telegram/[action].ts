@@ -63,12 +63,13 @@ bot.command('login', (ctx) =>
 )
 const replyOptions = (ctx: CustomContext) => {
   const options: Types.ExtraReplyMessage = {}
-  options.parse_mode = 'MarkdownV2'
+  options.parse_mode = 'HTML'
   if (ctx.message.chat.type !== 'private') {
     options.reply_to_message_id = ctx.message.message_id
   }
   return options
 }
+const replyEscape = (value: string) => value.replace('<', '&lt;').replace('>', '&gt;').replace('&', '&amp;')
 const replyWithLogin = (ctx: CustomContext, options: Types.ExtraReplyMessage) => {
   options.reply_markup = Markup.inlineKeyboard([loginButton]).reply_markup
   return ctx.reply("I wasn't talking to you, little light.", options)
@@ -86,7 +87,7 @@ bot.command('whoami', async (ctx) => {
     const { characters } = await Bungie.Destiny2GetProfileCharacters(ctx.user.tokens, ctx.user.profile)
     ctx.user.character = characters.data[Object.keys(characters.data)[0]]
 
-    await ctx.reply(`${ctx.user.bungie_username} with _${ctx.user.character.light}_ light`, options)
+    await ctx.reply(`${ctx.user.bungie_username} with <i>${ctx.user.character.light}<i> light`, options)
   } else {
     await replyWithLogin(ctx, options)
   }
@@ -107,7 +108,7 @@ bot.command('weekly', async (ctx) => {
     await ctx.reply(
       ctx.user.activities
         .filter((v) => v.activityHash in Bungie.ActivityHash)
-        .map((v) => `*${v.name}*\n${v.desciption}`)
+        .map((v) => `<b>${replyEscape(v.name)}</b>*\n${replyEscape(v.desciption)}`)
         .join('\n\n'),
       options
     )
