@@ -7,7 +7,7 @@ import nookies from 'nookies'
 import { AuthResponse } from './api/auth/[action]'
 import axios from 'axios'
 
-export default function Guardian({ message, url, state }: InferGetServerSidePropsType<typeof getServerSideProps>) {
+export default function Guardian({ message, url, state, user }: InferGetServerSidePropsType<typeof getServerSideProps>) {
   const router = useRouter()
   useEffect(() => {
     if (url) {
@@ -15,6 +15,7 @@ export default function Guardian({ message, url, state }: InferGetServerSideProp
         router.replace(url)
       }, 1000)
     }
+    console.dir(user)
   }, [url, router])
 
   if (!state) {

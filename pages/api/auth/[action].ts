@@ -1,7 +1,7 @@
 import { DateTime } from 'luxon'
 import { checkAuth } from '../../../lib/telegram'
 import { sign, verify } from '../../../lib/crypt'
-import { saveUser } from '../../../lib/store'
+import { saveUser, readUser, UserModel } from '../../../lib/store'
 import * as Bungie from '../../../lib/bungie'
 import type { NextApiRequest, NextApiResponse } from 'next'
 import { withSentry } from '@sentry/nextjs'
@@ -18,6 +18,7 @@ export interface AuthResponse {
   token?: string
   expires_in?: number
   state?: State
+  user?: UserModel
 }
 
 export default withSentry(async (req: NextApiRequest, res: NextApiResponse<AuthResponse>) => {
@@ -107,7 +108,8 @@ export default withSentry(async (req: NextApiRequest, res: NextApiResponse<AuthR
       return res.status(401).json({ message: 'You must start login from Telegram.' })
     }
 
-    return res.status(200).json({ state })
+    const user = await readUser(state.telegram_id)
+    return res.status(200).json({ state, user })
   }
 
   return res.status(404).end()

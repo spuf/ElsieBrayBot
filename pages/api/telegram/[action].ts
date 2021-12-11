@@ -86,18 +86,6 @@ bot.command('linked', async (ctx) => {
   }
 })
 
-bot.command('debug', async (ctx) => {
-  if (ctx.message.chat.type === 'private') {
-    await ctx.reply('```json\n' + JSON.stringify(ctx.user, null, 2) + '\n```', { parse_mode: 'MarkdownV2' })
-  }
-})
-
-const commands = [
-  { command: 'start', description: 'System wipe' },
-  { command: 'poll', description: 'When are you ready to play?' },
-  { command: 'login', description: 'Let me in' },
-  { command: 'whoami', description: 'Who am I?' },
-]
 export default withSentry(async (req: NextApiRequest, res: NextApiResponse<void>) => {
   if (req.query.action === process.env.BOT_CRON_ACTION) {
     if (req.method !== 'POST') {
@@ -108,10 +96,12 @@ export default withSentry(async (req: NextApiRequest, res: NextApiResponse<void>
       bot.telegram.setWebhook(process.env.BOT_BASE_URL + process.env.BOT_HOOK_ACTION, {
         max_connections: 1,
       }),
-      bot.telegram.setMyCommands(commands),
-      bot.telegram.setMyCommands(commands.concat([{ command: 'debug', description: 'Show my data' }]), {
-        scope: { type: 'all_private_chats' },
-      }),
+      bot.telegram.setMyCommands([
+        { command: 'start', description: 'System wipe' },
+        { command: 'poll', description: 'When are you ready to play?' },
+        { command: 'login', description: 'Let me in' },
+        { command: 'whoami', description: 'Who am I?' },
+      ]),
     ])
 
     return res.status(200).end()
