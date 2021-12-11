@@ -6,7 +6,7 @@ import type { AppProps } from 'next/app'
 function ElsieBray({ Component, pageProps }: AppProps) {
   return (
     <div className="container">
-      <NextNProgress options={{ showSpinner: false }} />
+      <NextNProgress color="#0070f3" options={{ showSpinner: false }} />
       <Head>
         <title>ElsieBrayBot</title>
       </Head>

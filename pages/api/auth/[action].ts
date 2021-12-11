@@ -21,7 +21,7 @@ export interface AuthResponse {
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse<AuthResponse>) {
   if (req.query.action === 'telegram') {
-    if (req.method !== 'GET') {
+    if (req.method !== 'POST') {
       return res.status(405).end()
     }
     if (Number(req.query.auth_date) < DateTime.now().minus({ minutes: 1 }).toSeconds()) {
@@ -47,7 +47,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse<
   }
 
   if (req.query.action === 'bungie') {
-    if (req.method !== 'GET') {
+    if (req.method !== 'POST') {
       return res.status(405).end()
     }
 
@@ -94,7 +94,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse<
   }
 
   if (req.query.action === 'check') {
-    if (req.method !== 'GET') {
+    if (req.method !== 'POST') {
       return res.status(405).end()
     }
 
