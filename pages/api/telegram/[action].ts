@@ -68,8 +68,8 @@ const replyWithLogin = (ctx: CustomContext, options: Types.ExtraReplyMessage) =>
 bot.command('whoami', async (ctx) => {
   const options = replyOptions(ctx)
   if (ctx.user) {
-    ctx.user.profile = await Bungie.UserGetBungieNetUserById(ctx.user.tokens)
-    ctx.user.bungie_username = ctx.user.profile.uniqueName
+    ctx.user.bungie = await Bungie.UserGetBungieNetUserById(ctx.user.tokens)
+    ctx.user.bungie_username = ctx.user.bungie.uniqueName
     await ctx.reply(ctx.user.bungie_username, options)
   } else {
     await replyWithLogin(ctx, options)
