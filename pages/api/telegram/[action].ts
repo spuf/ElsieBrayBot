@@ -80,7 +80,7 @@ bot.command('whoami', async (ctx) => {
   if (ctx.user?.bungie && ctx.user?.character) {
     ctx.user.bungie = await Bungie.UserGetBungieNetUserById(ctx.user.tokens)
 
-    const { characters } = await Bungie.Destiny2GetProfileCharacters(ctx.user.tokens, ctx.user.profile)
+    const { characters } = await Bungie.Destiny2GetProfileCharacters(ctx.user.tokens, ctx.user.character)
     ctx.user.character = characters.data[ctx.user.character.characterId]
 
     await ctx.reply(`${ctx.user.bungie.uniqueName} with <i>${ctx.user.character.light}</i> light`, options)
@@ -93,7 +93,7 @@ bot.command('weekly', async (ctx) => {
   const options = replyOptions(ctx)
   if (ctx.user) {
     const manifest = await getDestinyManifest()
-    const data = await Bungie.Destiny2GetCharacterActivities(ctx.user.tokens, ctx.user.profile, ctx.user.character)
+    const data = await Bungie.Destiny2GetCharacterActivities(ctx.user.tokens, ctx.user.character)
     ctx.user.activities = data.activities.data.availableActivities.map((v) => {
       const m = manifest.jsonWorldComponentContentPaths.en.DestinyActivityDefinition[v.activityHash].displayProperties
       v.name = m.name
