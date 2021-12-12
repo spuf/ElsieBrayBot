@@ -174,7 +174,7 @@ export async function Destiny2GetLinkedProfiles(tokens: TokenSet) {
   )
 }
 
-export interface DestinyCharacter {
+export interface DestinyCharacter extends DestinyProfile {
   characterId: string
   membershipType: number
   membershipId: string
@@ -188,11 +188,11 @@ export interface DestinyProfileCharacters {
 }
 
 // https://bungie-net.github.io/multi/operation_get_Destiny2-GetProfile.html#operation_get_Destiny2-GetProfile
-export async function Destiny2GetProfileCharacters(tokens: TokenSet, character: DestinyCharacter) {
+export async function Destiny2GetProfileCharacters(tokens: TokenSet, profile: DestinyProfile) {
   const res = await ask<DestinyProfileCharacters>(
     tokens,
-    `https://www.bungie.net/Platform/Destiny2/${character.membershipType}/Profile/${
-      character.membershipId
+    `https://www.bungie.net/Platform/Destiny2/${profile.membershipType}/Profile/${
+      profile.membershipId
     }/?${new URLSearchParams({ components: [DestinyComponentType.Characters].join(',') }).toString()}`
   )
   for (const key in res.characters.data) {
