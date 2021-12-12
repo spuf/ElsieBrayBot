@@ -34,7 +34,7 @@ export default withSentry(async (req: NextApiRequest, res: NextApiResponse<AuthR
   if (typeof req.query.token === 'string') {
     state = await verify<State>(req.query.token)
   }
-  if (!state) {
+  if (!state || req.query.hash) {
     const { id, username, date, sign, hash } = Telegram.getData(req.query)
     if (!id) {
       return res.status(401).json({ message: 'You must start login from Telegram.' })
