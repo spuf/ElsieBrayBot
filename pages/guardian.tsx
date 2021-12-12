@@ -1,49 +1,99 @@
-import { useEffect } from 'react'
+import axios from 'axios'
+import { GetServerSideProps, InferGetServerSidePropsType } from 'next'
+import Image from 'next/image'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
-import { GetServerSideProps } from 'next'
-import { InferGetServerSidePropsType } from 'next'
 import nookies from 'nookies'
-import { AuthResponse } from './api/auth/[action]'
-import axios from 'axios'
+import { useEffect, useState } from 'react'
+import { AuthResponse } from './api/auth'
 
-export default function Guardian({
-  message,
-  url,
-  state,
-  user,
-}: InferGetServerSidePropsType<typeof getServerSideProps>) {
+function Character({ character }) {
+  return (
+    <>
+      <Image src={character.emblemPath} alt="Emblem" width={60} height={60} />
+      <br />
+      {character.light}
+    </>
+  )
+}
+
+export default function Guardian(init: InferGetServerSidePropsType<typeof getServerSideProps>) {
+  const [props, setProps] = useState(init)
+  const { message, bungie_url, state, user, characters, token } = props
   const router = useRouter()
   useEffect(() => {
-    if (url) {
+    if (bungie_url) {
       setTimeout(() => {
-        router.replace(url)
+        router.push(bungie_url)
       }, 1000)
     }
     console.dir(user)
-  }, [url, router, user])
+  }, [bungie_url, router, user])
 
-  if (!state) {
-    return (
-      <div className="center">
-        <p>
-          <Link href="/">
-            <a>← Return to Orbit</a>
-          </Link>
-        </p>
-        <p>{message}</p>
-        {url && (
+  const data = {
+    message: message ? <p>{message}</p> : null,
+    telegram: null,
+    bungie: null,
+    character: null,
+  }
+  if (state) {
+    const { telegram_username, bungie, character } = state
+    if (telegram_username) {
+      data.telegram = <p>Telegram: @{telegram_username}</p>
+
+      if (bungie) {
+        data.bungie = <p>Bungie.net: {bungie.uniqueName}</p>
+
+        if (character) {
+          data.character = (
+            <p>
+              <Character character={character} />
+            </p>
+          )
+        } else if (characters?.length > 0) {
+          data.character = (
+            <>
+              <p>Select your character:</p>
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-around' }}>
+                {characters.map((character) => {
+                  return (
+                    <div key={character.characterId}>
+                      <a
+                        href={`?character=${character.characterId}`}
+                        onClick={async (e) => {
+                          e.preventDefault()
+                          const res = await axios.post(`/api/auth?character=${character.characterId}&token=${token}`)
+                          setProps(res.data)
+                        }}
+                      >
+                        <Character character={character} />
+                      </a>
+                    </div>
+                  )
+                })}
+              </div>
+            </>
+          )
+        } else {
+          data.character = <p>Error Bungie characters :(</p>
+        }
+      } else if (bungie_url) {
+        data.bungie = (
           <p>
-            <Link href={url} replace>
-              <a>Continue →</a>
+            Bungie.net:{' '}
+            <Link href={bungie_url}>
+              <a>Login →</a>
             </Link>
           </p>
-        )}
-      </div>
-    )
+        )
+      } else {
+        data.bungie = <p>Error Bungie :(</p>
+      }
+    } else {
+      data.telegram = <p>Error Telegram :(</p>
+    }
   }
 
-  const { telegram_username, bungie_username } = state
   return (
     <div className="center">
       <p>
@@ -51,43 +101,48 @@ export default function Guardian({
           <a>← Return to Orbit</a>
         </Link>
       </p>
-      <p>
-        @{telegram_username} is {bungie_username}
-      </p>
+      {data.message}
+      {data.telegram}
+      {data.bungie}
+      {data.character}
     </div>
   )
 }
 
 export const getServerSideProps: GetServerSideProps<AuthResponse> = async (ctx) => {
-  const cookies = nookies.get(ctx)
   const { query, resolvedUrl } = ctx
   const url = new URL(resolvedUrl, process.env.BASE_URL)
-  let props: AuthResponse = {}
-  if (query.id && query.hash) {
-    url.pathname = '/api/auth/telegram'
-    const res = await axios.post(url.toString())
-    props = res.data
-  } else if (query.state) {
-    url.pathname = '/api/auth/bungie'
-    const res = await axios.post(url.toString())
-    props = res.data
-  } else if (cookies.token) {
-    url.pathname = '/api/auth/check'
+  url.pathname = '/api/auth'
+
+  const cookies = nookies.get(ctx)
+  if (cookies.token) {
     url.searchParams.set('token', cookies.token)
-    try {
-      const res = await axios.post(url.toString())
-      props = res.data
-    } catch (e) {
-      console.error(e)
-      nookies.destroy(ctx, 'token')
-    }
   }
-  if (props.token && props.expires_in) {
+
+  let props: AuthResponse = {}
+  try {
+    console.log(url.toString())
+    const res = await axios.post(url.toString(), null, {
+      validateStatus: (s) => s < 500,
+    })
+    props = res.data
+  } catch (e) {
+    console.error(e)
+  }
+
+  console.log(props)
+
+  if (props.token) {
     nookies.set(ctx, 'token', props.token, {
       secure: true,
       httpOnly: true,
-      maxAge: props.expires_in,
+      maxAge: 2629800,
     })
+  }
+
+  if (Object.keys(query).length > 0) {
+    const url = new URL(resolvedUrl, process.env.BASE_URL)
+    return { redirect: { destination: url.pathname, statusCode: 302 } }
   }
 
   return { props }

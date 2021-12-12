@@ -7,6 +7,9 @@ const { withSentryConfig } = require('@sentry/nextjs')
  **/
 const nextConfig = {
   reactStrictMode: true,
+  images: {
+    domains: ['www.bungie.net'],
+  },
 }
 
 // @ts-ignore

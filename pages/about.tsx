@@ -1,9 +1,8 @@
+import * as fs from 'fs/promises'
+import { GetStaticProps, InferGetStaticPropsType } from 'next'
+import Link from 'next/link'
 import ReactMarkdown from 'react-markdown'
 import remarkGfm from 'remark-gfm'
-import Link from 'next/link'
-import { GetStaticProps } from 'next'
-import { InferGetStaticPropsType } from 'next'
-import * as fs from 'fs/promises'
 
 export default function About({ markdown }: InferGetStaticPropsType<typeof getStaticProps>) {
   return (

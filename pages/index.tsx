@@ -1,6 +1,6 @@
-import avatar from '../public/avatar.jpg'
 import Image from 'next/image'
 import Link from 'next/link'
+import avatar from '../public/avatar.jpg'
 
 export default function Index() {
   const size = 122
