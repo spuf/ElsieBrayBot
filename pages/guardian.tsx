@@ -53,7 +53,6 @@ export default function Guardian(init: InferGetServerSidePropsType<typeof getSer
         } else if (characters?.length > 0) {
           data.character = (
             <>
-              <p>Select your character:</p>
               <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-around' }}>
                 {characters.map((character) => {
                   return (
