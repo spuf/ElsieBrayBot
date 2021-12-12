@@ -1,9 +1,9 @@
-import { Telegraf, Markup, Context, Types } from 'telegraf'
+import { captureException, withSentry } from '@sentry/nextjs'
 import { DateTime } from 'luxon'
-import { readUser, saveUser, saveDestinyManifest, getDestinyManifest, UserModel } from '../../../lib/store'
 import type { NextApiRequest, NextApiResponse } from 'next'
+import { Context, Markup, Telegraf, Types } from 'telegraf'
 import * as Bungie from '../../../lib/bungie'
-import { withSentry, captureException } from '@sentry/nextjs'
+import { getDestinyManifest, readUser, saveDestinyManifest, saveUser, UserModel } from '../../../lib/store'
 
 interface CustomContext extends Context {
   user?: UserModel
@@ -77,17 +77,13 @@ const replyWithLogin = (ctx: CustomContext, options: Types.ExtraReplyMessage) =>
 
 bot.command('whoami', async (ctx) => {
   const options = replyOptions(ctx)
-  if (ctx.user) {
+  if (ctx.user?.bungie && ctx.user?.character) {
     ctx.user.bungie = await Bungie.UserGetBungieNetUserById(ctx.user.tokens)
-    ctx.user.bungie_username = ctx.user.bungie.uniqueName
-
-    const { profiles } = await Bungie.Destiny2GetLinkedProfiles(ctx.user.tokens)
-    ctx.user.profile = profiles[0]
 
     const { characters } = await Bungie.Destiny2GetProfileCharacters(ctx.user.tokens, ctx.user.profile)
-    ctx.user.character = characters.data[Object.keys(characters.data)[0]]
+    ctx.user.character = characters.data[ctx.user.character.characterId]
 
-    await ctx.reply(`${ctx.user.bungie_username} with <i>${ctx.user.character.light}</i> light`, options)
+    await ctx.reply(`${ctx.user.bungie.uniqueName} with <i>${ctx.user.character.light}</i> light`, options)
   } else {
     await replyWithLogin(ctx, options)
   }

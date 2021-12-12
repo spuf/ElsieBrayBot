@@ -1,7 +1,7 @@
 import * as admin from 'firebase-admin'
-import { State } from '../pages/api/auth/[action]'
+import { State } from '../pages/api/auth'
 import * as Bungie from './bungie'
-import { encrypt, decrypt, hash } from './crypt'
+import { decrypt, encrypt, hash } from './crypt'
 
 admin.initializeApp({
   credential: admin.credential.cert(JSON.parse(process.env.GOOGLE_APPLICATION_CREDENTIALS)),
@@ -25,9 +25,7 @@ async function save(key: string, value: any) {
 
 export interface UserModel extends State {
   tokens?: Bungie.TokenSet
-  bungie?: Bungie.GeneralUser
   profile?: Bungie.DestinyProfile
-  character?: Bungie.DestinyCharacter
   activities?: Bungie.DestinyActivity[]
 }
 

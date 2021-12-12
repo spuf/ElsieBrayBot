@@ -1,7 +1,7 @@
-import '../styles/globals.css'
+import type { AppProps } from 'next/app'
 import Head from 'next/head'
 import NextNProgress from 'nextjs-progressbar'
-import type { AppProps } from 'next/app'
+import '../styles/globals.css'
 
 function ElsieBray({ Component, pageProps }: AppProps) {
   return (
