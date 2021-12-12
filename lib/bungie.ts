@@ -188,11 +188,11 @@ export interface DestinyProfileCharacters {
 }
 
 // https://bungie-net.github.io/multi/operation_get_Destiny2-GetProfile.html#operation_get_Destiny2-GetProfile
-export async function Destiny2GetProfileCharacters(tokens: TokenSet, profile: DestinyProfile) {
+export async function Destiny2GetProfileCharacters(tokens: TokenSet, character: DestinyCharacter) {
   const res = await ask<DestinyProfileCharacters>(
     tokens,
-    `https://www.bungie.net/Platform/Destiny2/${profile.membershipType}/Profile/${
-      profile.membershipId
+    `https://www.bungie.net/Platform/Destiny2/${character.membershipType}/Profile/${
+      character.membershipId
     }/?${new URLSearchParams({ components: [DestinyComponentType.Characters].join(',') }).toString()}`
   )
   for (const key in res.characters.data) {
@@ -219,14 +219,10 @@ export interface DestinyCharacterActivities {
 }
 
 // https://bungie-net.github.io/multi/operation_get_Destiny2-GetProfile.html#operation_get_Destiny2-GetProfile
-export async function Destiny2GetCharacterActivities(
-  tokens: TokenSet,
-  profile: DestinyProfile,
-  character: DestinyCharacter
-) {
+export async function Destiny2GetCharacterActivities(tokens: TokenSet, character: DestinyCharacter) {
   return await ask<DestinyCharacterActivities>(
     tokens,
-    `https://www.bungie.net/Platform/Destiny2/${profile.membershipType}/Profile/${profile.membershipId}/Character/${
+    `https://www.bungie.net/Platform/Destiny2/${character.membershipType}/Profile/${character.membershipId}/Character/${
       character.characterId
     }/?${new URLSearchParams({ components: [DestinyComponentType.CharacterActivities].join(',') }).toString()}`
   )
