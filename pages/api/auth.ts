@@ -90,7 +90,7 @@ export default withSentry(async (req: NextApiRequest, res: NextApiResponse<AuthR
   if (!state.character) {
     const { profiles } = await Bungie.Destiny2GetLinkedProfiles(user.tokens)
     const data = await Promise.all(
-      profiles.map((v) => Bungie.Destiny2GetProfileCharacters(user.tokens, user.character))
+      profiles.map((v) => Bungie.Destiny2GetProfileCharacters(user.tokens, v))
     )
     const characters = data.map((v) => Object.values(v.characters.data)).flat()
 
