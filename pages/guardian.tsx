@@ -1,4 +1,5 @@
 import axios from 'axios'
+import { Duration } from 'luxon'
 import { GetServerSideProps, InferGetServerSidePropsType } from 'next'
 import Image from 'next/image'
 import Link from 'next/link'
@@ -135,7 +136,7 @@ export const getServerSideProps: GetServerSideProps<AuthResponse> = async (ctx) 
     nookies.set(ctx, 'token', props.token, {
       secure: true,
       httpOnly: true,
-      maxAge: 2629800,
+      maxAge: Duration.fromObject({ months: 1 }).as('seconds'),
     })
   }
 
