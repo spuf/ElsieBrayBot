@@ -20,6 +20,17 @@ enum Locale {
 export enum ActivityHash {
   NightfallGrandmaster = 2416314393,
   IronBanner = 1683791010,
+  EmpireHuntTheWarriorMaster = 4173217513,
+  EmpireHuntTheTechnocratMaster = 5517242,
+  EmpireHuntTheDarkPriestessMaster = 2205920677,
+  SimulationAgility = 3784931086,
+  SimulationSurvival = 2361093350,
+  SimulationSafeguard = 1262994080,
+  GlorySurvival = 2865450620,
+  MomentumControl = 935998519,
+  ShatteredRealmForestOfEchoesLegend = 63248868,
+  ShatteredRealmRuinsOfWrathLegend = 1228062601,
+  ShatteredRealmDebrisOfDreamsLegend = 20606942,
 }
 
 // https://github.com/Bungie-net/api/wiki/OAuth-Documentation#authorization-request
@@ -207,7 +218,7 @@ export async function Destiny2GetProfileCharacters(tokens: TokenSet, profile: De
 
 export interface DestinyActivity {
   name?: string
-  desciption?: string
+  description?: string
   activityHash: string
 }
 export interface DestinyCharacterActivities {
