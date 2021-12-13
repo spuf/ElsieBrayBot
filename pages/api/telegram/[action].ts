@@ -97,14 +97,14 @@ bot.command('weekly', async (ctx) => {
     ctx.user.activities = data.activities.data.availableActivities.map((v) => {
       const m = manifest.jsonWorldComponentContentPaths.en.DestinyActivityDefinition[v.activityHash].displayProperties
       v.name = m.name
-      v.desciption = m.description
+      v.description = m.description
       return v
     })
 
     await ctx.reply(
       ctx.user.activities
         .filter((v) => v.activityHash in Bungie.ActivityHash)
-        .map((v) => `<b>${replyEscape(v.name)}</b>\n${replyEscape(v.desciption)}`)
+        .map((v) => `<b>${replyEscape(v.name)}</b>\n${replyEscape(v.description.split('\n')[0].trim())}`)
         .join('\n\n'),
       options
     )

@@ -105,6 +105,7 @@ export default withSentry(async (req: NextApiRequest, res: NextApiResponse<AuthR
 
     if (!character) {
       const jwt = await sign(state, DateTime.now().plus({ minutes: AUTH_SESSION_MINUTES }).toSeconds())
+      delete user.tokens
       return res.status(200).json({
         token: jwt,
         state,
@@ -125,9 +126,7 @@ export default withSentry(async (req: NextApiRequest, res: NextApiResponse<AuthR
   }
 
   const jwt = await sign(state, DateTime.now().plus({ months: 1 }).toSeconds())
-
   delete user.tokens
-
   nookies.set({ res }, 'token', jwt, {
     secure: true,
     httpOnly: true,
