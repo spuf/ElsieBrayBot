@@ -1,5 +1,5 @@
 import { withSentry } from '@sentry/nextjs'
-import { DateTime } from 'luxon'
+import { DateTime, Duration } from 'luxon'
 import type { NextApiRequest, NextApiResponse } from 'next'
 import nookies from 'nookies'
 import * as Bungie from '../../lib/bungie'
@@ -130,7 +130,7 @@ export default withSentry(async (req: NextApiRequest, res: NextApiResponse<AuthR
   nookies.set({ res }, 'token', jwt, {
     secure: true,
     httpOnly: true,
-    expires: DateTime.now().plus({ months: 1 }).toHTTP(),
+    maxAge: Duration.fromObject({ months: 1 }).as('seconds'),
   })
   return res.status(200).json({
     token: jwt,
