@@ -57,18 +57,6 @@ export default withSentry(async (req: NextApiRequest, res: NextApiResponse<AuthR
     })
   }
 
-  if (!user) {
-    user = await readUser(state.telegram_id)
-    if (user) {
-      state = {
-        telegram_id: state.telegram_id,
-        telegram_username: state.telegram_username,
-        bungie: user.bungie,
-        character: user.character,
-      }
-    }
-  }
-
   if (!state.bungie) {
     if (typeof req.query.code !== 'string') {
       const jwt = await sign(state, DateTime.now().plus({ minutes: AUTH_SESSION_MINUTES }).toSeconds())
@@ -88,8 +76,17 @@ export default withSentry(async (req: NextApiRequest, res: NextApiResponse<AuthR
     }
     user = { ...state, tokens }
     await saveUser(state.telegram_id, user)
+
+    const jwt = await sign(state, DateTime.now().plus({ minutes: AUTH_SESSION_MINUTES }).toSeconds())
+    return res.status(200).json({
+      token: jwt,
+      state,
+    })
   }
 
+  if (!user) {
+    user = await readUser(state.telegram_id)
+  }
   if (!user || !user.tokens) {
     return res.status(401).json({
       message: 'You must login again.',
