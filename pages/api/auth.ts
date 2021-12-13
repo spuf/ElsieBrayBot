@@ -109,6 +109,7 @@ export default withSentry(async (req: NextApiRequest, res: NextApiResponse<AuthR
         token: jwt,
         state,
         characters: characters,
+        user,
       })
     }
 

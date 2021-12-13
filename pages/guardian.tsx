@@ -62,7 +62,10 @@ export default function Guardian(init: InferGetServerSidePropsType<typeof getSer
                         href={`?character=${character.characterId}`}
                         onClick={async (e) => {
                           e.preventDefault()
-                          const res = await axios.post(`/api/auth?character=${character.characterId}&token=${token}`)
+                          const res = await axios.post('/api/auth', null, {
+                            params: { character: character.characterId, token: token },
+                            withCredentials: true,
+                          })
                           setProps(res.data)
                         }}
                       >
