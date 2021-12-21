@@ -149,5 +149,14 @@ export default withSentry(async (req: NextApiRequest, res: NextApiResponse<void>
     return res.status(200).end()
   }
 
+  if (req.query.action === process.env.BOT_TWEET_ACTION) {
+    if (req.method !== 'POST') {
+      return res.status(405).end()
+    }
+
+    await bot.telegram.sendMessage(process.env.BOT_TWEET_CHAT_ID, req.body.link)
+    return res.status(200).end()
+  }
+
   return res.status(404).end()
 })

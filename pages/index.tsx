@@ -1,6 +1,6 @@
 import Image from 'next/image'
 import Link from 'next/link'
-import avatar from '../public/avatar.jpg'
+import avatar from '../public/images/avatar.jpg'
 
 export default function Index() {
   const size = 122
@@ -10,6 +10,7 @@ export default function Index() {
         <a>
           <div
             style={{
+              position: 'relative',
               width: `${size}px`,
               height: `${size}px`,
               borderRadius: `${size / 2}px`,
@@ -17,7 +18,7 @@ export default function Index() {
               overflow: 'hidden',
             }}
           >
-            <Image src={avatar} alt="Avatar" placeholder="blur" />
+            <Image src={avatar} alt="Avatar" placeholder="blur" layout="fill" objectFit="contain" />
           </div>
         </a>
       </Link>
