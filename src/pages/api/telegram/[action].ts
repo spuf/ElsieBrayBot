@@ -116,7 +116,8 @@ bot.command('weekly', async (ctx) => {
 export default withSentry(async (req: NextApiRequest, res: NextApiResponse<void>) => {
   if (req.query.action === process.env.BOT_CRON_ACTION) {
     if (req.method !== 'POST') {
-      return res.status(405).end()
+      res.status(405).end()
+      return
     }
 
     try {
@@ -137,26 +138,31 @@ export default withSentry(async (req: NextApiRequest, res: NextApiResponse<void>
       captureException(e)
       throw e
     }
-    return res.status(200).end()
+    res.status(200).end()
+    return
   }
 
   if (req.query.action === process.env.BOT_HOOK_ACTION) {
     if (req.method !== 'POST') {
-      return res.status(405).end()
+      res.status(405).end()
+      return
     }
 
     await bot.handleUpdate(req.body)
-    return res.status(200).end()
+    res.status(200).end()
+    return
   }
 
   if (req.query.action === process.env.BOT_TWEET_ACTION) {
     if (req.method !== 'POST') {
-      return res.status(405).end()
+      res.status(405).end()
+      return
     }
 
     await bot.telegram.sendMessage(process.env.BOT_TWEET_CHAT_ID, req.body.link)
-    return res.status(200).end()
+    res.status(200).end()
+    return
   }
 
-  return res.status(404).end()
+  res.status(404).end()
 })

@@ -26,7 +26,8 @@ const AUTH_SESSION_MINUTES = 15
 
 export default withSentry(async (req: NextApiRequest, res: NextApiResponse<AuthResponse>) => {
   if (req.method !== 'POST') {
-    return res.status(405).end()
+    res.status(405).end()
+    return
   }
 
   let user: UserModel
@@ -37,13 +38,16 @@ export default withSentry(async (req: NextApiRequest, res: NextApiResponse<AuthR
   if (!state || req.query.hash) {
     const { id, username, date, sign, hash } = Telegram.getData(req.query)
     if (!id) {
-      return res.status(401).json({ message: 'You must start login from Telegram.' })
+      res.status(401).json({ message: 'You must start login from Telegram.' })
+      return
     }
     if (date < DateTime.now().minus({ minutes: AUTH_SESSION_MINUTES }).toSeconds()) {
-      return res.status(401).json({ message: 'Telegram sends expired data.' })
+      res.status(401).json({ message: 'Telegram sends expired data.' })
+      return
     }
     if (!Telegram.checkSign(sign, hash)) {
-      return res.status(401).json({ message: 'Telegram sends invalid data.' })
+      res.status(401).json({ message: 'Telegram sends invalid data.' })
+      return
     }
     state = {
       telegram_id: id,
@@ -52,20 +56,22 @@ export default withSentry(async (req: NextApiRequest, res: NextApiResponse<AuthR
   }
 
   if (!state.telegram_id) {
-    return res.status(401).json({
+    res.status(401).json({
       message: 'You must try again from Telegram.',
     })
+    return
   }
 
   if (!state.bungie) {
     if (typeof req.query.code !== 'string') {
       const jwt = await sign(state, DateTime.now().plus({ minutes: AUTH_SESSION_MINUTES }).toSeconds())
 
-      return res.status(200).json({
+      res.status(200).json({
         token: jwt,
         state,
         bungie_url: Bungie.generateAuthUrl(jwt),
       })
+      return
     }
     let tokens = await Bungie.getAccessToken(req.query.code)
     const bungie = await Bungie.UserGetBungieNetUserById(tokens)
@@ -78,19 +84,21 @@ export default withSentry(async (req: NextApiRequest, res: NextApiResponse<AuthR
     await saveUser(state.telegram_id, user)
 
     const jwt = await sign(state, DateTime.now().plus({ minutes: AUTH_SESSION_MINUTES }).toSeconds())
-    return res.status(200).json({
+    res.status(200).json({
       token: jwt,
       state,
     })
+    return
   }
 
   if (!user) {
     user = await readUser(state.telegram_id)
   }
   if (!user || !user.tokens) {
-    return res.status(401).json({
+    res.status(401).json({
       message: 'You must login again.',
     })
+    return
   }
 
   if (!state.character) {
@@ -106,12 +114,13 @@ export default withSentry(async (req: NextApiRequest, res: NextApiResponse<AuthR
     if (!character) {
       const jwt = await sign(state, DateTime.now().plus({ minutes: AUTH_SESSION_MINUTES }).toSeconds())
       delete user.tokens
-      return res.status(200).json({
+      res.status(200).json({
         token: jwt,
         state,
         characters: characters,
         user,
       })
+      return
     }
 
     state = {
@@ -132,7 +141,7 @@ export default withSentry(async (req: NextApiRequest, res: NextApiResponse<AuthR
     httpOnly: true,
     maxAge: Duration.fromObject({ months: 1 }).as('seconds'),
   })
-  return res.status(200).json({
+  res.status(200).json({
     token: jwt,
     state,
     user,
