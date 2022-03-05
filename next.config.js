@@ -2,6 +2,8 @@
 
 const { withSentryConfig } = require('@sentry/nextjs')
 
+const dsn = process.env.SENTRY_DSN || process.env.NEXT_PUBLIC_SENTRY_DSN
+
 /**
  * @type {import('next').NextConfig}
  **/
@@ -43,4 +45,4 @@ const nextConfig = {
 }
 
 // @ts-ignore
-module.exports = withSentryConfig(nextConfig, { silent: true })
+module.exports = withSentryConfig(nextConfig, { dryRun: !dsn, silent: true })
