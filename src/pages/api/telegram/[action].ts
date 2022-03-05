@@ -158,8 +158,12 @@ export default withSentry(async (req: NextApiRequest, res: NextApiResponse<void>
       res.status(405).end()
       return
     }
-
-    await bot.telegram.sendMessage(process.env.BOT_TWEET_CHAT_ID, req.body.link)
+    const { link, text } = req.body
+    await bot.telegram.sendMessage(process.env.BOT_TWEET_CHAT_ID, text, {
+      disable_notification: true,
+      disable_web_page_preview: true,
+      entities: [{ offset: 0, length: text.length, type: 'text_link', url: link }],
+    })
     res.status(200).end()
     return
   }
