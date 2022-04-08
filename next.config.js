@@ -38,6 +38,11 @@ const nextConfig = {
             key: 'Referrer-Policy',
             value: 'origin-when-cross-origin',
           },
+          {
+            key: 'Content-Security-Policy-Report-Only',
+            value:
+              "default-src 'none'; form-action 'none'; frame-ancestors 'none'; report-uri https://spuf.report-uri.com/r/d/csp/wizard",
+          },
         ],
       },
     ]
