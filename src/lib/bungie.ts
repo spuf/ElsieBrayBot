@@ -1,5 +1,9 @@
-import axios from 'axios'
+import axios, { AxiosError } from 'axios'
 import { DateTime } from 'luxon'
+
+const BUNGIE_CLIENT_ID = process.env.BUNGIE_CLIENT_ID as string
+const BUNGIE_SECRET = process.env.BUNGIE_SECRET as string
+const BUNGIE_API_KEY = process.env.BUNGIE_API_KEY as string
 
 // https://bungie-net.github.io/multi/schema_BungieMembershipType.html#schema_BungieMembershipType
 enum BungieMembershipType {
@@ -36,7 +40,7 @@ export enum ActivityHash {
 // https://github.com/Bungie-net/api/wiki/OAuth-Documentation#authorization-request
 export function generateAuthUrl(state: string): string {
   const url = new URL('https://www.bungie.net/en/oauth/authorize')
-  url.searchParams.set('client_id', process.env.BUNGIE_CLIENT_ID)
+  url.searchParams.set('client_id', BUNGIE_CLIENT_ID)
   url.searchParams.set('response_type', 'code')
   url.searchParams.set('state', state)
 
@@ -44,11 +48,11 @@ export function generateAuthUrl(state: string): string {
 }
 
 export interface TokenSet {
-  created_at?: number
+  created_at: number
   access_token?: string
   token_type?: string
-  expires_in?: number
-  refresh_token?: string
+  expires_in: number
+  refresh_token: string
   refresh_expires_in?: number
   membership_id?: string
 }
@@ -63,8 +67,8 @@ export async function getAccessToken(code: string): Promise<TokenSet> {
     }),
     {
       auth: {
-        username: process.env.BUNGIE_CLIENT_ID,
-        password: process.env.BUNGIE_SECRET,
+        username: BUNGIE_CLIENT_ID,
+        password: BUNGIE_SECRET,
       },
     }
   )
@@ -85,8 +89,8 @@ export async function refreshAccessToken(tokens: TokenSet): Promise<TokenSet> {
     }),
     {
       auth: {
-        username: process.env.BUNGIE_CLIENT_ID,
-        password: process.env.BUNGIE_SECRET,
+        username: BUNGIE_CLIENT_ID,
+        password: BUNGIE_SECRET,
       },
     }
   )
@@ -114,7 +118,7 @@ export async function getDestinyManifest(): Promise<DestinyManifest> {
   try {
     const res = await axios.get('https://www.bungie.net/Platform/Destiny2/Manifest/', {
       headers: {
-        'X-API-Key': process.env.BUNGIE_API_KEY,
+        'X-API-Key': BUNGIE_API_KEY,
       },
     })
     const data = res.data.Response
@@ -135,7 +139,11 @@ export async function getDestinyManifest(): Promise<DestinyManifest> {
     ).data
     return data
   } catch (e) {
-    console.error(e.message, e.response.data ?? e.request)
+    if (e instanceof AxiosError) {
+      console.error(e.message, e.response?.data ?? e.request)
+    } else {
+      console.error(e)
+    }
     throw e
   }
 }
@@ -145,13 +153,17 @@ async function ask<T>(tokens: TokenSet, url: string): Promise<T> {
     const res = await axios.get(url, {
       headers: {
         Authorization: `Bearer ${tokens.access_token}`,
-        'X-API-Key': process.env.BUNGIE_API_KEY,
+        'X-API-Key': BUNGIE_API_KEY,
       },
     })
     console.log(res.data)
     return res.data.Response
   } catch (e) {
-    console.error(e.message, e.response.data ?? e.request)
+    if (e instanceof AxiosError) {
+      console.error(e.message, e.response?.data ?? e.request)
+    } else {
+      console.error(e)
+    }
     throw e
   }
 }
@@ -217,8 +229,8 @@ export async function Destiny2GetProfileCharacters(tokens: TokenSet, profile: De
 }
 
 export interface DestinyActivity {
-  name?: string
-  description?: string
+  name: string
+  description: string
   activityHash: string
 }
 export interface DestinyCharacterActivities {

@@ -6,9 +6,14 @@ import Link from 'next/link'
 import { useRouter } from 'next/router'
 import nookies from 'nookies'
 import { useEffect, useState } from 'react'
+import { UserModel } from '../lib/store'
 import { AuthResponse } from './api/auth'
 
-function Character({ character }) {
+function Character({ character }: UserModel) {
+  if (!character) {
+    throw new Error()
+  }
+
   return (
     <>
       <Image src={character.emblemPath} alt="Emblem" width={60} height={60} />
@@ -31,7 +36,7 @@ export default function Guardian(init: InferGetServerSidePropsType<typeof getSer
     console.dir(user)
   }, [bungie_url, router, user])
 
-  const data = {
+  const data: { [key: string]: JSX.Element | null } = {
     message: message ? <p>{message}</p> : null,
     telegram: null,
     bungie: null,
@@ -51,7 +56,7 @@ export default function Guardian(init: InferGetServerSidePropsType<typeof getSer
               <Character character={character} />
             </p>
           )
-        } else if (characters?.length > 0) {
+        } else if (characters && characters.length > 0) {
           data.character = (
             <>
               <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-around' }}>

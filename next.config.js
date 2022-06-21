@@ -1,15 +1,11 @@
-// @ts-check
-
 const { withSentryConfig } = require('@sentry/nextjs')
 
 const dsn = process.env.SENTRY_DSN || process.env.NEXT_PUBLIC_SENTRY_DSN
 
-/**
- * @type {import('next').NextConfig}
- **/
+/** @type {import('next').NextConfig} */
 const nextConfig = {
-  poweredByHeader: false,
   reactStrictMode: true,
+  poweredByHeader: false,
   images: {
     domains: ['www.bungie.net'],
   },
