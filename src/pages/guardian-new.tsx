@@ -1,10 +1,15 @@
 import type { GetServerSideProps, InferGetServerSidePropsType } from 'next'
 import Image from 'next/image'
 import Link from 'next/link'
+import { UserModel } from '../lib/store'
 import styles from '../styles/Guardian.module.css'
 import type { AuthResponse } from './api/auth'
 
-function Character({ character }) {
+function Character({ character }: UserModel) {
+  if (!character) {
+    throw new Error()
+  }
+
   return (
     <div className={styles.emblem}>
       <Image className={styles.background} src={character.emblemPath} alt="Emblem" layout="fill" objectFit="contain" />
@@ -14,6 +19,13 @@ function Character({ character }) {
 }
 
 export default function Guardian({ user }: InferGetServerSidePropsType<typeof getServerSideProps>) {
+  if (!user) {
+    return <p>Login</p>
+  }
+  if (!user.bungie) {
+    return <p>Login Bungie</p>
+  }
+
   return (
     <div className="center">
       <p>

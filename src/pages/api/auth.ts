@@ -30,8 +30,8 @@ export default withSentry(async (req: NextApiRequest, res: NextApiResponse<AuthR
     return
   }
 
-  let user: UserModel
-  let state: State
+  let user: UserModel | null = null
+  let state: State | null = null
   if (typeof req.query.token === 'string') {
     state = await verify<State>(req.query.token)
   }
@@ -41,7 +41,7 @@ export default withSentry(async (req: NextApiRequest, res: NextApiResponse<AuthR
       res.status(401).json({ message: 'You must start login from Telegram.' })
       return
     }
-    if (date < DateTime.now().minus({ minutes: AUTH_SESSION_MINUTES }).toSeconds()) {
+    if (Number(date) < DateTime.now().minus({ minutes: AUTH_SESSION_MINUTES }).toSeconds()) {
       res.status(401).json({ message: 'Telegram sends expired data.' })
       return
     }
@@ -81,7 +81,7 @@ export default withSentry(async (req: NextApiRequest, res: NextApiResponse<AuthR
       bungie,
     }
     user = { ...state, tokens }
-    await saveUser(state.telegram_id, user)
+    await saveUser(state.telegram_id as string, user)
 
     const jwt = await sign(state, DateTime.now().plus({ minutes: AUTH_SESSION_MINUTES }).toSeconds())
     res.status(200).json({
@@ -103,12 +103,13 @@ export default withSentry(async (req: NextApiRequest, res: NextApiResponse<AuthR
 
   if (!state.character) {
     const { profiles } = await Bungie.Destiny2GetLinkedProfiles(user.tokens)
-    const data = await Promise.all(profiles.map((v) => Bungie.Destiny2GetProfileCharacters(user.tokens, v)))
+    const tokens = user.tokens
+    const data = await Promise.all(profiles.map((v) => Bungie.Destiny2GetProfileCharacters(tokens, v)))
     const characters = data.map((v) => Object.values(v.characters.data)).flat()
 
-    let character: Bungie.DestinyCharacter = null
+    let character: Bungie.DestinyCharacter | null = null
     if (typeof req.query.character === 'string') {
-      character = characters.find((v) => v.characterId === req.query.character)
+      character = characters.find((v) => v.characterId === req.query.character) || null
     }
 
     if (!character) {
@@ -131,7 +132,7 @@ export default withSentry(async (req: NextApiRequest, res: NextApiResponse<AuthR
     }
 
     user = { ...user, ...state }
-    await saveUser(state.telegram_id, user)
+    await saveUser(state.telegram_id as string, user)
   }
 
   const jwt = await sign(state, DateTime.now().plus({ months: 1 }).toSeconds())

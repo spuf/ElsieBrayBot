@@ -5,11 +5,19 @@ import { Context, Markup, Telegraf, Types } from 'telegraf'
 import * as Bungie from '../../../lib/bungie'
 import { getDestinyManifest, readUser, saveDestinyManifest, saveUser, UserModel } from '../../../lib/store'
 
+const BASE_URL = process.env.BASE_URL as string
+const BOT_TOKEN = process.env.BOT_TOKEN as string
+const BOT_BASE_URL = process.env.BOT_BASE_URL as string
+const BOT_HOOK_ACTION = process.env.BOT_HOOK_ACTION as string
+const BOT_CRON_ACTION = process.env.BOT_CRON_ACTION as string
+const BOT_TWEET_ACTION = process.env.BOT_TWEET_ACTION as string
+const BOT_TWEET_CHAT_ID = process.env.BOT_TWEET_CHAT_ID as string
+
 interface CustomContext extends Context {
-  user?: UserModel
+  user: UserModel | null
 }
 
-const bot = new Telegraf<CustomContext>(process.env.BOT_TOKEN, {
+const bot = new Telegraf<CustomContext>(BOT_TOKEN, {
   telegram: { webhookReply: true },
 })
 
@@ -24,21 +32,25 @@ bot.use(async (ctx, next) => {
 })
 bot.use(async (ctx, next) => {
   const id = ctx.from?.id?.toString()
-  ctx.user = id ? await readUser(id) : null
-  if (ctx.user) {
-    ctx.user.tokens = await Bungie.refreshAccessToken(ctx.user.tokens)
+  if (!id) {
     await next()
-    await saveUser(id, ctx.user)
-  } else {
-    await next()
+    return
   }
+  ctx.user = await readUser(id)
+  if (!ctx.user || !ctx.user.tokens) {
+    await next()
+    return
+  }
+  ctx.user.tokens = await Bungie.refreshAccessToken(ctx.user.tokens)
+  await next()
+  await saveUser(id, ctx.user)
 })
 
 bot.start((ctx) =>
   ctx.reply(`I don't even have time to explain why I don't have time to explain.`, Markup.removeKeyboard())
 )
 
-const zoneNames = {
+const zoneNames: { [key: string]: string } = {
   'Europe/Moscow': 'MSK',
   'Europe/London': 'LND',
 }
@@ -57,14 +69,14 @@ bot.command('poll', (ctx) => {
   })
 })
 
-const loginButton = Markup.button.login('Let me in', new URL('/guardian', process.env.BASE_URL).toString())
+const loginButton = Markup.button.login('Let me in', new URL('/guardian', BASE_URL).toString())
 bot.command('login', (ctx) =>
   ctx.reply('Many Guardians fell. Strong ones. But you made it here.', Markup.inlineKeyboard([loginButton]))
 )
 const replyOptions = (ctx: CustomContext) => {
   const options: Types.ExtraReplyMessage = {}
   options.parse_mode = 'HTML'
-  if (ctx.message.chat.type !== 'private') {
+  if (ctx.message && ctx.message.chat.type !== 'private') {
     options.reply_to_message_id = ctx.message.message_id
   }
   return options
@@ -77,7 +89,7 @@ const replyWithLogin = (ctx: CustomContext, options: Types.ExtraReplyMessage) =>
 
 bot.command('whoami', async (ctx) => {
   const options = replyOptions(ctx)
-  if (ctx.user?.bungie && ctx.user?.character) {
+  if (ctx.user?.tokens && ctx.user?.bungie && ctx.user?.character) {
     ctx.user.bungie = await Bungie.UserGetBungieNetUserById(ctx.user.tokens)
 
     const { characters } = await Bungie.Destiny2GetProfileCharacters(ctx.user.tokens, ctx.user.character)
@@ -91,7 +103,7 @@ bot.command('whoami', async (ctx) => {
 
 bot.command('weekly', async (ctx) => {
   const options = replyOptions(ctx)
-  if (ctx.user) {
+  if (ctx.user && ctx.user.tokens && ctx.user.character) {
     const manifest = await getDestinyManifest()
     const data = await Bungie.Destiny2GetCharacterActivities(ctx.user.tokens, ctx.user.character)
     ctx.user.activities = data.activities.data.availableActivities.map((v) => {
@@ -114,7 +126,7 @@ bot.command('weekly', async (ctx) => {
 })
 
 export default withSentry(async (req: NextApiRequest, res: NextApiResponse<void>) => {
-  if (req.query.action === process.env.BOT_CRON_ACTION) {
+  if (req.query.action === BOT_CRON_ACTION) {
     if (req.method !== 'POST') {
       res.status(405).end()
       return
@@ -122,7 +134,7 @@ export default withSentry(async (req: NextApiRequest, res: NextApiResponse<void>
 
     try {
       await Promise.all([
-        bot.telegram.setWebhook(process.env.BOT_BASE_URL + process.env.BOT_HOOK_ACTION, {
+        bot.telegram.setWebhook(BOT_BASE_URL + BOT_HOOK_ACTION, {
           max_connections: 1,
         }),
         bot.telegram.setMyCommands([
@@ -142,7 +154,7 @@ export default withSentry(async (req: NextApiRequest, res: NextApiResponse<void>
     return
   }
 
-  if (req.query.action === process.env.BOT_HOOK_ACTION) {
+  if (req.query.action === BOT_HOOK_ACTION) {
     if (req.method !== 'POST') {
       res.status(405).end()
       return
@@ -153,7 +165,7 @@ export default withSentry(async (req: NextApiRequest, res: NextApiResponse<void>
     return
   }
 
-  if (req.query.action === process.env.BOT_TWEET_ACTION) {
+  if (req.query.action === BOT_TWEET_ACTION) {
     if (req.method !== 'POST') {
       res.status(405).end()
       return
@@ -162,7 +174,7 @@ export default withSentry(async (req: NextApiRequest, res: NextApiResponse<void>
     if (req.body.link && text && !text.includes('https://')) {
       text = `${text}\n${req.body.link}`
     }
-    await bot.telegram.sendMessage(process.env.BOT_TWEET_CHAT_ID, text, {
+    await bot.telegram.sendMessage(BOT_TWEET_CHAT_ID, text, {
       disable_notification: true,
       disable_web_page_preview: true,
     })

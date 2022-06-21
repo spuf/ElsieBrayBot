@@ -3,8 +3,10 @@ import { State } from '../pages/api/auth'
 import * as Bungie from './bungie'
 import { decrypt, encrypt, hash } from './crypt'
 
+const GOOGLE_APPLICATION_CREDENTIALS = process.env.GOOGLE_APPLICATION_CREDENTIALS as string
+
 admin.initializeApp({
-  credential: admin.credential.cert(JSON.parse(process.env.GOOGLE_APPLICATION_CREDENTIALS)),
+  credential: admin.credential.cert(JSON.parse(GOOGLE_APPLICATION_CREDENTIALS)),
   databaseURL: 'https://elsie-bray-bot-default-rtdb.firebaseio.com',
 })
 
