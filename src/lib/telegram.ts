@@ -6,7 +6,7 @@ const BOT_TOKEN = process.env.BOT_TOKEN as string
 const telegarms_args = ['id', 'first_name', 'last_name', 'username', 'photo_url', 'auth_date']
 telegarms_args.sort()
 
-export function getData(query: { [x: string]: string | string[] }) {
+export function getData(query: Partial<{ [x: string]: string | string[] }>) {
   const sign = telegarms_args
     .filter((k) => query[k])
     .map((k) => `${k}=${String(query[k])}`)
