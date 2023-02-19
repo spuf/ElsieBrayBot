@@ -1,4 +1,5 @@
 import { captureException, withSentry } from '@sentry/nextjs'
+import { AxiosError } from 'axios'
 import { DateTime } from 'luxon'
 import type { NextApiRequest, NextApiResponse } from 'next'
 import { Context, Markup, Telegraf, Types } from 'telegraf'
@@ -41,7 +42,15 @@ bot.use(async (ctx, next) => {
     await next()
     return
   }
-  ctx.user.tokens = await Bungie.refreshAccessToken(ctx.user.tokens)
+  try {
+    ctx.user.tokens = await Bungie.refreshAccessToken(ctx.user.tokens)
+  } catch (e) {
+    if (e instanceof AxiosError) {
+      console.error(e.message, e.response?.data ?? e.request)
+    } else {
+      console.error(e)
+    }
+  }
   await next()
   await saveUser(id, ctx.user)
 })
