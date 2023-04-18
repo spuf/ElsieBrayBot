@@ -160,6 +160,7 @@ export default withSentry(async (req: NextApiRequest, res: NextApiResponse<void>
         }),
         bot.telegram.setMyCommands([
           { command: 'start', description: 'System wipe' },
+          { command: 'time', description: 'Could you please tell me the time?' },
           { command: 'poll', description: 'When are you ready to play?' },
           { command: 'login', description: 'Let me in' },
           { command: 'whoami', description: 'Who am I?' },
