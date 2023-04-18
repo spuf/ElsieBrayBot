@@ -60,14 +60,15 @@ bot.start((ctx) =>
 )
 
 const zoneNames: { [key: string]: string } = {
-  'Europe/Moscow': 'MSK',
-  'Europe/London': 'LND',
+  'Europe/Moscow': 'Moscow',
+  'Europe/London': 'London',
+  'Europe/Lisbon': 'Lisbon',
 }
 bot.command('poll', (ctx) => {
   const now = DateTime.now()
   const time = now.plus({ minutes: 10 - (now.minute % 10) })
   const options = [30, 60, 90, 120].map((m) =>
-    ['Europe/Moscow', 'Europe/London']
+    Object.keys(zoneNames)
       .map((tz) => time.plus({ minutes: m }).setZone(tz).toFormat('HH:mm') + ' ' + zoneNames[tz])
       .join(' '.repeat(4))
   )
@@ -76,6 +77,15 @@ bot.command('poll', (ctx) => {
   return ctx.replyWithPoll('When are you ready to play?', options, {
     is_anonymous: false,
   })
+})
+
+bot.command('time', async (ctx) => {
+  const now = DateTime.now()
+  return ctx.reply(
+    Object.keys(zoneNames)
+      .map((tz) => `${now.setZone(tz).toFormat('HH:mm')} <i>${zoneNames[tz]}</i>`)
+      .join('\n')
+  )
 })
 
 const loginButton = Markup.button.login('Let me in', new URL('/guardian', BASE_URL).toString())
