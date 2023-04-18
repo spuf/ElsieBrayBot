@@ -80,11 +80,13 @@ bot.command('poll', (ctx) => {
 })
 
 bot.command('time', async (ctx) => {
+  const options = replyOptions(ctx)
   const now = DateTime.now()
   return ctx.reply(
     Object.keys(zoneNames)
       .map((tz) => `${now.setZone(tz).toFormat('HH:mm')} <i>${zoneNames[tz]}</i>`)
-      .join('\n')
+      .join('\n'),
+    options
   )
 })
 
