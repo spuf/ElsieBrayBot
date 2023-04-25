@@ -84,7 +84,7 @@ bot.command('time', async (ctx) => {
   const now = DateTime.now()
   return ctx.reply(
     Object.keys(zoneNames)
-      .map((tz) => `${now.setZone(tz).toFormat('HH:mm')} <i>${zoneNames[tz]}</i>`)
+      .map((tz) => `${now.setZone(tz).toFormat('HH:mm')} <i>${zoneNames[tz]}</i> UTC${now.setZone(tz).toFormat('Z')}`)
       .join('\n'),
     options
   )
