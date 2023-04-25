@@ -63,6 +63,7 @@ const zoneNames: { [key: string]: string } = {
   'Europe/Moscow': 'Moscow',
   'Europe/London': 'London',
   'Europe/Lisbon': 'Lisbon',
+  'America/Los_Angeles': 'PDT',
 }
 bot.command('poll', (ctx) => {
   const now = DateTime.now()
