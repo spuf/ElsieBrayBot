@@ -4,7 +4,7 @@ import { DateTime } from 'luxon'
 import type { NextApiRequest, NextApiResponse } from 'next'
 import { Context, Markup, Telegraf, Types } from 'telegraf'
 import * as Bungie from '../../../lib/bungie'
-import { getDestinyManifest, readUser, saveDestinyManifest, saveUser, UserModel } from '../../../lib/store'
+import { readUser, saveDestinyManifest, saveUser, UserModel } from '../../../lib/store'
 
 const BASE_URL = process.env.BASE_URL as string
 const BOT_TOKEN = process.env.BOT_TOKEN as string

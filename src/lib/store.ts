@@ -2,6 +2,7 @@ import * as admin from 'firebase-admin'
 import { State } from '../pages/api/auth'
 import * as Bungie from './bungie'
 import { decrypt, encrypt, hash } from './crypt'
+import { DestinyManifest } from 'bungie-api-ts/destiny2'
 
 const GOOGLE_APPLICATION_CREDENTIALS = process.env.GOOGLE_APPLICATION_CREDENTIALS as string
 
@@ -45,11 +46,11 @@ export async function readUser(id: string): Promise<UserModel> {
   return await decrypt(value)
 }
 
-export async function saveDestinyManifest(manifest: Bungie.DestinyManifest) {
+export async function saveDestinyManifest(manifest: DestinyManifest) {
   return await save('destiny', manifest)
 }
 
-export async function getDestinyManifest(): Promise<Bungie.DestinyManifest> {
+export async function getDestinyManifest(): Promise<DestinyManifest> {
   const snapshot = await admin.database().ref('destiny').get()
   return snapshot.val()
 }
