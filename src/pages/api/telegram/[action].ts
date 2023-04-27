@@ -83,11 +83,27 @@ bot.command('poll', (ctx) => {
 bot.command('time', async (ctx) => {
   const options = replyOptions(ctx)
 
+  let reqTz: string
+  const timezone = ctx.update.message.text.split(' ')[2] || null
+  if (timezone) {
+    Object.keys(zoneNames).forEach((tz) => {
+      if (timezone.toLowerCase() === zoneNames[tz].toLowerCase()) {
+        reqTz = tz
+      }
+    })
+  }
+
   let now = DateTime.now()
   const req = ctx.update.message.text.split(' ')[1] || null
   if (req) {
-    now = DateTime.fromMillis(Date.parse(req))
+    const formats = ['Hmm', 'H.mm', 'H:mm', 'hmma', 'hmm a', 'h.mma', 'h.mm a', 'h:mma', 'h:mm a']
+    formats.forEach((v) => {
+      now = DateTime.fromFormat(req, v, {
+        zone: reqTz,
+      })
+    })
   }
+
   return ctx.reply(
     Object.keys(zoneNames)
       .map((tz) => `${now.setZone(tz).toFormat('HH:mm')} <i>${zoneNames[tz]}</i> UTC${now.setZone(tz).toFormat('Z')}`)
