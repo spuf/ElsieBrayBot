@@ -165,6 +165,7 @@ export interface DestinyCharacter extends DestinyProfile {
   membershipId: string
   light: number
   emblemPath: string
+  emblemBackgroundPath: string
 }
 export interface DestinyProfileCharacters {
   characters: {
@@ -183,6 +184,10 @@ export async function Destiny2GetProfileCharacters(tokens: TokenSet, profile: De
   for (const key in res.characters.data) {
     res.characters.data[key].emblemPath = new URL(
       res.characters.data[key].emblemPath,
+      'https://www.bungie.net'
+    ).toString()
+    res.characters.data[key].emblemBackgroundPath = new URL(
+      res.characters.data[key].emblemBackgroundPath,
       'https://www.bungie.net'
     ).toString()
   }

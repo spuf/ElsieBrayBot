@@ -130,9 +130,11 @@ bot.command('login', (ctx) =>
 )
 const replyOptions = (ctx: CustomContext) => {
   const options: Types.ExtraReplyMessage = {}
+  options.protect_content = true
   options.parse_mode = 'HTML'
   if (ctx.message && ctx.message.chat.type !== 'private') {
     options.reply_to_message_id = ctx.message.message_id
+    options.allow_sending_without_reply = true
   }
   return options
 }
@@ -150,9 +152,9 @@ bot.command('whoami', async (ctx) => {
     ctx.user.character = characters.data[ctx.user.character.characterId]
 
     // await ctx.reply(`${ctx.user.bungie.uniqueName} with <i>${ctx.user.character.light}</i> light`, options)
-    await ctx.replyWithPhoto(ctx.user.character.emblemPath, {
+    await ctx.replyWithPhoto(ctx.user.character.emblemBackgroundPath, {
       ...options,
-      caption: `${ctx.user.bungie.uniqueName} with <i>${ctx.user.character.light}</i> light`,
+      caption: `${ctx.user.bungie.uniqueName} with <b>${ctx.user.character.light}</b> light`,
     })
   } else {
     await replyWithLogin(ctx, options)
