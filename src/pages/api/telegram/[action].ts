@@ -99,7 +99,7 @@ bot.command('time', async (ctx) => {
 
   let nowOk = false
   let now = DateTime.now()
-  const req = ctx.update.message.text.split(' ').slice(0, -1).join(' ') || null
+  const req = ctx.update.message.text.split(' ').slice(1, -1).join(' ') || null
   if (req) {
     const formats = ['Hmm', 'H.mm', 'H:mm', 'H', 'hmma', 'hmm a', 'h.mma', 'h.mm a', 'h:mma', 'h:mm a', 'h a', 'ha']
     formats.forEach((v) => {
