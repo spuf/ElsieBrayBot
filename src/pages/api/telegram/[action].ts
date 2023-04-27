@@ -83,18 +83,23 @@ bot.command('poll', (ctx) => {
 bot.command('time', async (ctx) => {
   const options = replyOptions(ctx)
 
+  let tzOk = false
   let reqTz = Object.keys(zoneNames)[0]
-  const timezone = ctx.update.message.text.split(' ')[2] || null
+  const timezone = ctx.update.message.text.split(' ').slice(-1)[0] || null
   if (timezone) {
     Object.keys(zoneNames).forEach((tz) => {
       if (timezone.toLowerCase() === zoneNames[tz].toLowerCase()) {
         reqTz = tz
+        tzOk = true
       }
     })
+  } else {
+    tzOk = true
   }
 
+  let nowOk = false
   let now = DateTime.now()
-  const req = ctx.update.message.text.split(' ')[1] || null
+  const req = ctx.update.message.text.split(' ').slice(0, -1).join(' ') || null
   if (req) {
     const formats = ['Hmm', 'H.mm', 'H:mm', 'H', 'hmma', 'hmm a', 'h.mma', 'h.mm a', 'h:mma', 'h:mm a', 'h a', 'ha']
     formats.forEach((v) => {
@@ -103,10 +108,16 @@ bot.command('time', async (ctx) => {
       })
       if (dt.isValid) {
         now = dt
+        nowOk = true
       }
     })
+  } else {
+    nowOk = true
   }
 
+  if (!tzOk || !nowOk) {
+    return ctx.reply('I believe where our paths cross, ground... could break.', options)
+  }
   return ctx.reply(
     Object.keys(zoneNames)
       .map((tz) => `${now.setZone(tz).toFormat('HH:mm')} <i>${zoneNames[tz]}</i> UTC${now.setZone(tz).toFormat('Z')}`)
