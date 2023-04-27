@@ -136,7 +136,6 @@ const replyOptions = (ctx: CustomContext) => {
   }
   return options
 }
-const replyEscape = (value: string) => value.replace('<', '&lt;').replace('>', '&gt;').replace('&', '&amp;')
 const replyWithLogin = (ctx: CustomContext, options: Types.ExtraReplyMessage) => {
   options.reply_markup = Markup.inlineKeyboard([loginButton]).reply_markup
   return ctx.reply("I wasn't talking to you, little light.", options)
@@ -151,30 +150,6 @@ bot.command('whoami', async (ctx) => {
     ctx.user.character = characters.data[ctx.user.character.characterId]
 
     await ctx.reply(`${ctx.user.bungie.uniqueName} with <i>${ctx.user.character.light}</i> light`, options)
-  } else {
-    await replyWithLogin(ctx, options)
-  }
-})
-
-bot.command('weekly', async (ctx) => {
-  const options = replyOptions(ctx)
-  if (ctx.user && ctx.user.tokens && ctx.user.character) {
-    const manifest = await getDestinyManifest()
-    const data = await Bungie.Destiny2GetCharacterActivities(ctx.user.tokens, ctx.user.character)
-    ctx.user.activities = data.activities.data.availableActivities.map((v) => {
-      const m = manifest.jsonWorldComponentContentPaths.en.DestinyActivityDefinition[v.activityHash].displayProperties
-      v.name = m.name
-      v.description = m.description
-      return v
-    })
-
-    await ctx.reply(
-      ctx.user.activities
-        .filter((v) => v.activityHash in Bungie.ActivityHash)
-        .map((v) => `<b>${replyEscape(v.name)}</b>\n${replyEscape(v.description.split('\n')[0].trim())}`)
-        .join('\n\n'),
-      options
-    )
   } else {
     await replyWithLogin(ctx, options)
   }
@@ -198,7 +173,6 @@ const handler = async (req: NextApiRequest, res: NextApiResponse<void>) => {
           { command: 'poll', description: 'When are you ready to play?' },
           { command: 'login', description: 'Let me in' },
           { command: 'whoami', description: 'Who am I?' },
-          { command: 'weekly', description: 'What is going on' },
         ]),
         Bungie.getDestinyManifest().then((v) => saveDestinyManifest(v)),
       ])

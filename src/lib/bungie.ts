@@ -227,26 +227,3 @@ export async function Destiny2GetProfileCharacters(tokens: TokenSet, profile: De
 
   return res
 }
-
-export interface DestinyActivity {
-  name: string
-  description: string
-  activityHash: string
-}
-export interface DestinyCharacterActivities {
-  activities: {
-    data: {
-      availableActivities: DestinyActivity[]
-    }
-  }
-}
-
-// https://bungie-net.github.io/multi/operation_get_Destiny2-GetProfile.html#operation_get_Destiny2-GetProfile
-export async function Destiny2GetCharacterActivities(tokens: TokenSet, character: DestinyCharacter) {
-  return await ask<DestinyCharacterActivities>(
-    tokens,
-    `https://www.bungie.net/Platform/Destiny2/${character.membershipType}/Profile/${character.membershipId}/Character/${
-      character.characterId
-    }/?${new URLSearchParams({ components: [DestinyComponentType.CharacterActivities].join(',') }).toString()}`
-  )
-}
