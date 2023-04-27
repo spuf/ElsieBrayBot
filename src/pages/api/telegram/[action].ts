@@ -83,41 +83,39 @@ bot.command('poll', (ctx) => {
 bot.command('time', async (ctx) => {
   const options = replyOptions(ctx)
 
-  let tzOk = false
-  let reqTz = Object.keys(zoneNames)[0]
-  const timezone = ctx.update.message.text.split(' ').slice(-1)[0] || null
-  if (timezone) {
-    Object.keys(zoneNames).forEach((tz) => {
-      if (timezone.toLowerCase() === zoneNames[tz].toLowerCase()) {
-        reqTz = tz
-        tzOk = true
-      }
-    })
-  } else {
-    tzOk = true
-  }
-
-  let nowOk = false
-  let now = DateTime.now()
-  const req = ctx.update.message.text.split(' ').slice(1, -1).join(' ') || null
-  if (req) {
-    const formats = ['Hmm', 'H.mm', 'H:mm', 'H', 'hmma', 'hmm a', 'h.mma', 'h.mm a', 'h:mma', 'h:mm a', 'h a', 'ha']
-    formats.forEach((v) => {
-      const dt = DateTime.fromFormat(req.toUpperCase(), v, {
-        zone: reqTz,
+  let result: DateTime | undefined
+  const args = ctx.update.message.text.split(' ')
+  if (args.length > 1) {
+    let reqTz: string | undefined
+    const argTz = args.slice(-1)[0] || null
+    if (argTz) {
+      Object.keys(zoneNames).forEach((tz) => {
+        if (argTz.toLowerCase() === zoneNames[tz].toLowerCase()) {
+          reqTz = tz
+        }
       })
-      if (dt.isValid) {
-        now = dt
-        nowOk = true
+    }
+    if (reqTz) {
+      const argTime = ctx.update.message.text.split(' ').slice(1, -1).join(' ') || null
+      if (argTime) {
+        const formats = ['Hmm', 'H.mm', 'H:mm', 'H', 'hmma', 'hmm a', 'h.mma', 'h.mm a', 'h:mma', 'h:mm a', 'h a', 'ha']
+        formats.forEach((v) => {
+          const dt = DateTime.fromFormat(argTime.toUpperCase(), v, {
+            zone: reqTz,
+          })
+          if (dt.isValid) {
+            result = dt
+          }
+        })
       }
-    })
-  } else {
-    nowOk = true
+    }
+
+    if (!result) {
+      return ctx.reply('I believe where our paths cross, ground... could break.', options)
+    }
   }
 
-  if (!tzOk || !nowOk) {
-    return ctx.reply('I believe where our paths cross, ground... could break.', options)
-  }
+  const now = result || DateTime.now()
   return ctx.reply(
     Object.keys(zoneNames)
       .map((tz) => `${now.setZone(tz).toFormat('HH:mm')} <i>${zoneNames[tz]}</i> UTC${now.setZone(tz).toFormat('Z')}`)
