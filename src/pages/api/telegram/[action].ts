@@ -80,7 +80,7 @@ bot.command('poll', (ctx) => {
   })
 })
 
-bot.command('time', async (ctx) => {
+bot.command('time', (ctx) => {
   const options = replyOptions(ctx)
 
   let result: DateTime | undefined
@@ -149,7 +149,11 @@ bot.command('whoami', async (ctx) => {
     const { characters } = await Bungie.Destiny2GetProfileCharacters(ctx.user.tokens, ctx.user.character)
     ctx.user.character = characters.data[ctx.user.character.characterId]
 
-    await ctx.reply(`${ctx.user.bungie.uniqueName} with <i>${ctx.user.character.light}</i> light`, options)
+    // await ctx.reply(`${ctx.user.bungie.uniqueName} with <i>${ctx.user.character.light}</i> light`, options)
+    await ctx.replyWithPhoto(ctx.user.character.emblemPath, {
+      ...options,
+      caption: `${ctx.user.bungie.uniqueName} with <i>${ctx.user.character.light}</i> light`,
+    })
   } else {
     await replyWithLogin(ctx, options)
   }
