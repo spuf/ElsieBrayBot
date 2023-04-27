@@ -65,6 +65,8 @@ export const getServerSideProps: GetServerSideProps<AuthResponse> = async (ctx) 
         membershipType: 100,
         light: 1440,
         emblemPath: 'https://www.bungie.net/common/destiny2_content/icons/30304f81bf77ad95f5176aa706e20a96.jpg',
+        emblemBackgroundPath:
+          'https://www.bungie.net/common/destiny2_content/icons/30304f81bf77ad95f5176aa706e20a96.jpg',
       },
     },
   }
