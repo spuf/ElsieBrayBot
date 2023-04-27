@@ -27,7 +27,6 @@ async function save(key: string, value: any) {
 
 export interface UserModel extends State {
   tokens?: Bungie.TokenSet
-  activities?: Bungie.DestinyActivity[]
 }
 
 export async function saveUser(id: string, data: UserModel) {
