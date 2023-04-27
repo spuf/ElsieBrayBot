@@ -70,8 +70,8 @@ bot.command('poll', (ctx) => {
   const time = now.plus({ minutes: 10 - (now.minute % 10) })
   const options = [30, 60, 90, 120].map((m) =>
     Object.keys(zoneNames)
-      .map((tz) => time.plus({ minutes: m }).setZone(tz).toFormat('HH:mm') + ' ' + zoneNames[tz])
-      .join(' '.repeat(4))
+      .map((tz) => `${time.plus({ minutes: m }).setZone(tz).toFormat('HH:mm')} <i>${zoneNames[tz]}</i>`)
+      .join(' ')
   )
   options.push('Later')
   options.push('Pass')
@@ -83,7 +83,7 @@ bot.command('poll', (ctx) => {
 bot.command('time', async (ctx) => {
   const options = replyOptions(ctx)
 
-  let reqTz: string
+  let reqTz = Object.keys(zoneNames)[0]
   const timezone = ctx.update.message.text.split(' ')[2] || null
   if (timezone) {
     Object.keys(zoneNames).forEach((tz) => {
@@ -96,11 +96,14 @@ bot.command('time', async (ctx) => {
   let now = DateTime.now()
   const req = ctx.update.message.text.split(' ')[1] || null
   if (req) {
-    const formats = ['Hmm', 'H.mm', 'H:mm', 'hmma', 'hmm a', 'h.mma', 'h.mm a', 'h:mma', 'h:mm a']
+    const formats = ['Hmm', 'H.mm', 'H:mm', 'H', 'hmma', 'hmm a', 'h.mma', 'h.mm a', 'h:mma', 'h:mm a', 'h a', 'ha']
     formats.forEach((v) => {
-      now = DateTime.fromFormat(req, v, {
+      const dt = DateTime.fromFormat(req.toUpperCase(), v, {
         zone: reqTz,
       })
+      if (dt.isValid) {
+        now = dt
+      }
     })
   }
 
