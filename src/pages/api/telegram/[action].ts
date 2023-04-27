@@ -82,7 +82,12 @@ bot.command('poll', (ctx) => {
 
 bot.command('time', async (ctx) => {
   const options = replyOptions(ctx)
-  const now = DateTime.now()
+
+  let now = DateTime.now()
+  const req = ctx.update.message.text.split(' ')[1] || null
+  if (req) {
+    now = DateTime.fromMillis(Date.parse(req))
+  }
   return ctx.reply(
     Object.keys(zoneNames)
       .map((tz) => `${now.setZone(tz).toFormat('HH:mm')} <i>${zoneNames[tz]}</i> UTC${now.setZone(tz).toFormat('Z')}`)
