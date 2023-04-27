@@ -1,40 +1,19 @@
 import axios, { AxiosError } from 'axios'
 import { DateTime } from 'luxon'
+import { BungieMembershipType, DestinyComponentType, DestinyManifest } from 'bungie-api-ts/destiny2'
 
 const BUNGIE_CLIENT_ID = process.env.BUNGIE_CLIENT_ID as string
 const BUNGIE_SECRET = process.env.BUNGIE_SECRET as string
 const BUNGIE_API_KEY = process.env.BUNGIE_API_KEY as string
 
-// https://bungie-net.github.io/multi/schema_BungieMembershipType.html#schema_BungieMembershipType
-enum BungieMembershipType {
-  TigerPsn = 2,
-  All = -1,
-}
+/** @see BungieMembershipType.TigerPsn */
+const BungieMembershipType_TigerPsn = 2
 
-// https://bungie-net.github.io/multi/schema_Destiny-DestinyComponentType.html#schema_Destiny-DestinyComponentType
-enum DestinyComponentType {
-  Characters = 200,
-  CharacterActivities = 204,
-}
+/** @see DestinyComponentType.Characters */
+const DestinyComponentType_Characters = 200
 
 enum Locale {
   en = 'en',
-}
-
-export enum ActivityHash {
-  NightfallGrandmaster = 2416314393,
-  IronBanner = 1683791010,
-  EmpireHuntTheWarriorMaster = 4173217513,
-  EmpireHuntTheTechnocratMaster = 5517242,
-  EmpireHuntTheDarkPriestessMaster = 2205920677,
-  SimulationAgility = 3784931086,
-  SimulationSurvival = 2361093350,
-  SimulationSafeguard = 1262994080,
-  GlorySurvival = 2865450620,
-  MomentumControl = 935998519,
-  ShatteredRealmForestOfEchoesLegend = 63248868,
-  ShatteredRealmRuinsOfWrathLegend = 1228062601,
-  ShatteredRealmDebrisOfDreamsLegend = 20606942,
 }
 
 // https://github.com/Bungie-net/api/wiki/OAuth-Documentation#authorization-request
@@ -97,23 +76,6 @@ export async function refreshAccessToken(tokens: TokenSet): Promise<TokenSet> {
   return { ...(res.data as TokenSet), created_at: Math.floor(DateTime.now().toSeconds()) }
 }
 
-export interface DestinyManifest {
-  jsonWorldComponentContentPaths: {
-    [locale in Locale]: {
-      DestinyActivityDefinition: {
-        [hash: string]: {
-          displayProperties: {
-            name: string
-            description: string
-          }
-        }
-      }
-      DestinyActivityModeDefinition: {}
-      DestinyActivityTypeDefinition: {}
-    }
-  }
-  jsonWorldContentPaths: { [locale in Locale]: {} }
-}
 export async function getDestinyManifest(): Promise<DestinyManifest> {
   try {
     const res = await axios.get('https://www.bungie.net/Platform/Destiny2/Manifest/', {
@@ -193,7 +155,7 @@ interface DestinyLinkedProfilesResponse {
 export async function Destiny2GetLinkedProfiles(tokens: TokenSet) {
   return await ask<DestinyLinkedProfilesResponse>(
     tokens,
-    `https://www.bungie.net/Platform/Destiny2/${BungieMembershipType.TigerPsn}/Profile/${tokens.membership_id}/LinkedProfiles/`
+    `https://www.bungie.net/Platform/Destiny2/${BungieMembershipType_TigerPsn}/Profile/${tokens.membership_id}/LinkedProfiles/`
   )
 }
 
@@ -216,7 +178,7 @@ export async function Destiny2GetProfileCharacters(tokens: TokenSet, profile: De
     tokens,
     `https://www.bungie.net/Platform/Destiny2/${profile.membershipType}/Profile/${
       profile.membershipId
-    }/?${new URLSearchParams({ components: [DestinyComponentType.Characters].join(',') }).toString()}`
+    }/?${new URLSearchParams({ components: [DestinyComponentType_Characters].join(',') }).toString()}`
   )
   for (const key in res.characters.data) {
     res.characters.data[key].emblemPath = new URL(
