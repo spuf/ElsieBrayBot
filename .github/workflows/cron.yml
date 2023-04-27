@@ -1,7 +1,8 @@
 name: Cron
 on:
   schedule:
-    - cron: '0 * * * *'
+    - cron: '0 20 * * *'
+  deployment_status:
 jobs:
   cron:
     runs-on: ubuntu-latest
