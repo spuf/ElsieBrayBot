@@ -70,8 +70,8 @@ bot.command('poll', (ctx) => {
   const time = now.plus({ minutes: 10 - (now.minute % 10) })
   const options = [30, 60, 90, 120].map((m) =>
     Object.keys(zoneNames)
-      .map((tz) => `${time.plus({ minutes: m }).setZone(tz).toFormat('HH:mm')} <i>${zoneNames[tz]}</i>`)
-      .join(' ')
+      .map((tz) => `${time.plus({ minutes: m }).setZone(tz).toFormat('HH:mm')} ${zoneNames[tz]}`)
+      .join(', ')
   )
   options.push('Later')
   options.push('Pass')
