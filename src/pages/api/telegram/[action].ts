@@ -1,4 +1,4 @@
-import { captureException, withSentry } from '@sentry/nextjs'
+import { captureException } from '@sentry/nextjs'
 import { AxiosError } from 'axios'
 import { DateTime } from 'luxon'
 import type { NextApiRequest, NextApiResponse } from 'next'
@@ -147,7 +147,7 @@ bot.command('weekly', async (ctx) => {
   }
 })
 
-export default withSentry(async (req: NextApiRequest, res: NextApiResponse<void>) => {
+const handler = async (req: NextApiRequest, res: NextApiResponse<void>) => {
   if (req.query.action === BOT_CRON_ACTION) {
     if (req.method !== 'POST') {
       res.status(405).end()
@@ -206,4 +206,6 @@ export default withSentry(async (req: NextApiRequest, res: NextApiResponse<void>
   }
 
   res.status(404).end()
-})
+}
+
+export default handler

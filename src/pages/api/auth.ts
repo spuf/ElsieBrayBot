@@ -1,4 +1,3 @@
-import { withSentry } from '@sentry/nextjs'
 import { DateTime, Duration } from 'luxon'
 import type { NextApiRequest, NextApiResponse } from 'next'
 import nookies from 'nookies'
@@ -24,7 +23,7 @@ export interface AuthResponse {
 
 const AUTH_SESSION_MINUTES = 15
 
-export default withSentry(async (req: NextApiRequest, res: NextApiResponse<AuthResponse>) => {
+const handler = async (req: NextApiRequest, res: NextApiResponse<AuthResponse>) => {
   if (req.method !== 'POST') {
     res.status(405).end()
     return
@@ -147,4 +146,6 @@ export default withSentry(async (req: NextApiRequest, res: NextApiResponse<AuthR
     state,
     user,
   })
-})
+}
+
+export default handler
