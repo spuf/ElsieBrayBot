@@ -1,62 +1,36 @@
-export function compareTwoStrings(first: string, second: string) {
-  first = first.replace(/\s+/g, '')
-  second = second.replace(/\s+/g, '')
+// https://gist.github.com/keesey/e09d0af833476385b9ee13b6d26a2b84
 
-  if (first === second) return 1 // identical or empty
-  if (first.length < 2 || second.length < 2) return 0 // if either is a 0-letter or 1-letter string
-
-  let firstBigrams = new Map()
-  for (let i = 0; i < first.length - 1; i++) {
-    const bigram = first.substring(i, i + 2)
-    const count = firstBigrams.has(bigram) ? firstBigrams.get(bigram) + 1 : 1
-
-    firstBigrams.set(bigram, count)
+export function levenshtein(a: string, b: string): number {
+  const an = a ? a.length : 0
+  const bn = b ? b.length : 0
+  if (an === 0) {
+    return bn
   }
-
-  let intersectionSize = 0
-  for (let i = 0; i < second.length - 1; i++) {
-    const bigram = second.substring(i, i + 2)
-    const count = firstBigrams.has(bigram) ? firstBigrams.get(bigram) : 0
-
-    if (count > 0) {
-      firstBigrams.set(bigram, count - 1)
-      intersectionSize++
+  if (bn === 0) {
+    return an
+  }
+  const matrix = new Array<number[]>(bn + 1)
+  for (let i = 0; i <= bn; ++i) {
+    let row = (matrix[i] = new Array<number>(an + 1))
+    row[0] = i
+  }
+  const firstRow = matrix[0]
+  for (let j = 1; j <= an; ++j) {
+    firstRow[j] = j
+  }
+  for (let i = 1; i <= bn; ++i) {
+    for (let j = 1; j <= an; ++j) {
+      if (b.charAt(i - 1) === a.charAt(j - 1)) {
+        matrix[i][j] = matrix[i - 1][j - 1]
+      } else {
+        matrix[i][j] =
+          Math.min(
+            matrix[i - 1][j - 1], // substitution
+            matrix[i][j - 1], // insertion
+            matrix[i - 1][j] // deletion
+          ) + 1
+      }
     }
   }
-
-  return (2.0 * intersectionSize) / (first.length + second.length - 2)
-}
-
-export function findBestMatch(mainString: string, targetStrings: string[]) {
-  if (!areArgsValid(mainString, targetStrings))
-    throw new Error('Bad arguments: First argument should be a string, second should be an array of strings')
-
-  const ratings = []
-  let bestMatchIndex = 0
-
-  for (let i = 0; i < targetStrings.length; i++) {
-    const currentTargetString = targetStrings[i]
-    const currentRating = compareTwoStrings(mainString, currentTargetString)
-    ratings.push({ target: currentTargetString, rating: currentRating })
-    if (currentRating > ratings[bestMatchIndex].rating) {
-      bestMatchIndex = i
-    }
-  }
-
-  const bestMatch = ratings[bestMatchIndex]
-
-  return { ratings: ratings, bestMatch: bestMatch, bestMatchIndex: bestMatchIndex }
-}
-
-function areArgsValid(mainString: string, targetStrings: string[]) {
-  if (typeof mainString !== 'string') return false
-  if (!Array.isArray(targetStrings)) return false
-  if (!targetStrings.length) return false
-  if (
-    targetStrings.find(function (s) {
-      return typeof s !== 'string'
-    })
-  )
-    return false
-  return true
+  return matrix[bn][an]
 }
