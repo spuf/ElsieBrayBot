@@ -5,6 +5,7 @@ import type { NextApiRequest, NextApiResponse } from 'next'
 import { Context, Markup, Telegraf, Types } from 'telegraf'
 import * as Bungie from '../../../lib/bungie'
 import { readUser, saveDestinyManifest, saveUser, UserModel } from '../../../lib/store'
+import { compareTwoStrings } from '../../../lib/string-compare'
 
 const BASE_URL = process.env.BASE_URL as string
 const BOT_TOKEN = process.env.BOT_TOKEN as string
@@ -89,8 +90,11 @@ bot.command('time', (ctx) => {
     let reqTz: string | undefined
     const argTz = args.slice(-1)[0] || null
     if (argTz) {
+      let bestRating: number | null = null
       Object.keys(zoneNames).forEach((tz) => {
-        if (argTz.toLowerCase() === zoneNames[tz].toLowerCase()) {
+        const rating = compareTwoStrings(argTz.toLowerCase(), zoneNames[tz].toLowerCase())
+        if (bestRating == null || bestRating < rating) {
+          bestRating = rating
           reqTz = tz
         }
       })

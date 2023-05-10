@@ -1,6 +1,11 @@
 import axios, { AxiosError } from 'axios'
 import { DateTime } from 'luxon'
-import { BungieMembershipType, DestinyComponentType, DestinyManifest } from 'bungie-api-ts/destiny2'
+import {
+  BungieMembershipType,
+  DestinyComponentType,
+  DestinyManifest,
+  DestinyCharacterComponent,
+} from 'bungie-api-ts/destiny2'
 
 const BUNGIE_CLIENT_ID = process.env.BUNGIE_CLIENT_ID as string
 const BUNGIE_SECRET = process.env.BUNGIE_SECRET as string
