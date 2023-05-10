@@ -5,7 +5,7 @@ import type { NextApiRequest, NextApiResponse } from 'next'
 import { Context, Markup, Telegraf, Types } from 'telegraf'
 import * as Bungie from '../../../lib/bungie'
 import { readUser, saveDestinyManifest, saveUser, UserModel } from '../../../lib/store'
-import { compareTwoStrings } from '../../../lib/string-compare'
+import { levenshtein } from '../../../lib/string-compare'
 
 const BASE_URL = process.env.BASE_URL as string
 const BOT_TOKEN = process.env.BOT_TOKEN as string
@@ -85,16 +85,16 @@ bot.command('time', (ctx) => {
   const options = replyOptions(ctx)
 
   let result: DateTime | undefined
+  let reqTz: string | undefined
   const args = ctx.update.message.text.split(' ')
   if (args.length > 1) {
-    let reqTz: string | undefined
     const argTz = args.slice(-1)[0] || null
     if (argTz) {
-      let bestRating: number | null = null
+      let min: number | null = null
       Object.keys(zoneNames).forEach((tz) => {
-        const rating = compareTwoStrings(argTz.toLowerCase(), zoneNames[tz].toLowerCase())
-        if (bestRating == null || bestRating < rating) {
-          bestRating = rating
+        const cur = levenshtein(argTz.toLowerCase(), zoneNames[tz].toLowerCase())
+        if (min == null || min > cur) {
+          min = cur
           reqTz = tz
         }
       })
@@ -122,7 +122,12 @@ bot.command('time', (ctx) => {
   const now = result || DateTime.now()
   return ctx.reply(
     Object.keys(zoneNames)
-      .map((tz) => `${now.setZone(tz).toFormat('HH:mm')} <i>${zoneNames[tz]}</i> UTC${now.setZone(tz).toFormat('Z')}`)
+      .map(
+        (tz) =>
+          `${now.setZone(tz).toFormat('HH:mm')} ${
+            tz == reqTz ? '<b>${zoneNames[tz]}</b>' : '<i>${zoneNames[tz]}</i>'
+          } UTC${now.setZone(tz).toFormat('Z')}`
+      )
       .join('\n'),
     options
   )
