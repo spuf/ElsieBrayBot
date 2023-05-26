@@ -222,6 +222,8 @@ const handler = async (req: NextApiRequest, res: NextApiResponse<void>) => {
     await bot.telegram.sendMessage(BOT_TWEET_CHAT_ID, text, {
       disable_notification: true,
       disable_web_page_preview: true,
+      protect_content: true,
+      parse_mode: 'HTML',
     })
     res.status(200).end()
     return
