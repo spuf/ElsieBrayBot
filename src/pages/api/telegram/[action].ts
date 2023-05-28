@@ -217,7 +217,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse<void>) => {
       return
     }
     let text: string = req.body.text || ''
-    text = text.replace(/\<br\s*\/?\>/gm, '\n')
+    text = text.replace(/\<br\s*\/?\>/gmi, '\n')
     text = sanitizeHtml(text, {
       allowedTags: ['b', 'strong', 'i', 'em', 'u', 'ins', 's', 'strike', 'del', 'a', 'code', 'pre'],
       allowedAttributes: {
@@ -225,9 +225,8 @@ const handler = async (req: NextApiRequest, res: NextApiResponse<void>) => {
         code: ['class'],
       },
     })
-    if (req.body.link && text && !text.includes('https://')) {
-      text = `${text}\n${req.body.link}`
-    }
+    text = text.replace(/<a href="[^"]+">#destiny2<\/a>\s+\[[^]+\]/gmi, '\n')
+
     await bot.telegram.sendMessage(BOT_TWEET_CHAT_ID, text, {
       disable_notification: true,
       disable_web_page_preview: true,
