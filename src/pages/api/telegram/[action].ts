@@ -6,6 +6,7 @@ import { Context, Markup, Telegraf, Types } from 'telegraf'
 import * as Bungie from '../../../lib/bungie'
 import { readUser, saveDestinyManifest, saveUser, UserModel } from '../../../lib/store'
 import { levenshtein } from '../../../lib/string-compare'
+import sanitizeHtml from 'sanitize-html'
 
 const BASE_URL = process.env.BASE_URL as string
 const BOT_TOKEN = process.env.BOT_TOKEN as string
@@ -215,7 +216,16 @@ const handler = async (req: NextApiRequest, res: NextApiResponse<void>) => {
       res.status(405).end()
       return
     }
-    let text: string = req.body.text
+    let text: string = req.body.text || ''
+    text = text.replace(/\<br\s*\/?\>/gm, '\n')
+    text = sanitizeHtml(text, {
+      allowedTags: ['b', 'strong', 'i', 'em', 'u', 'ins', 's', 'strike', 'del', 'span', 'a', 'code', 'pre'],
+      allowedAttributes: {
+        span: ['class'],
+        a: ['href'],
+        code: ['class'],
+      },
+    })
     if (req.body.link && text && !text.includes('https://')) {
       text = `${text}\n${req.body.link}`
     }
