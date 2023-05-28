@@ -225,7 +225,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse<void>) => {
         code: ['class'],
       },
     })
-    text = text.replace(/<a href="[^"]+">#destiny2<\/a>\s+\[[^]+\]/gmi, '\n')
+    text = text.replace(/<a href="[^"]+">#destiny2<\/a>\s+\[[^]+\]/gmi, '')
 
     await bot.telegram.sendMessage(BOT_TWEET_CHAT_ID, text, {
       disable_notification: true,
