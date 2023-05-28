@@ -219,9 +219,8 @@ const handler = async (req: NextApiRequest, res: NextApiResponse<void>) => {
     let text: string = req.body.text || ''
     text = text.replace(/\<br\s*\/?\>/gm, '\n')
     text = sanitizeHtml(text, {
-      allowedTags: ['b', 'strong', 'i', 'em', 'u', 'ins', 's', 'strike', 'del', 'span', 'a', 'code', 'pre'],
+      allowedTags: ['b', 'strong', 'i', 'em', 'u', 'ins', 's', 'strike', 'del', 'a', 'code', 'pre'],
       allowedAttributes: {
-        span: ['class'],
         a: ['href'],
         code: ['class'],
       },
