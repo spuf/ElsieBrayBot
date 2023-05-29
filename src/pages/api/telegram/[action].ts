@@ -7,6 +7,7 @@ import * as Bungie from '../../../lib/bungie'
 import { readUser, saveDestinyManifest, saveUser, UserModel } from '../../../lib/store'
 import { levenshtein } from '../../../lib/string-compare'
 import sanitizeHtml from 'sanitize-html'
+import { kv } from '@vercel/kv'
 
 const BASE_URL = process.env.BASE_URL as string
 const BOT_TOKEN = process.env.BOT_TOKEN as string
@@ -80,6 +81,21 @@ bot.command('poll', (ctx) => {
   return ctx.replyWithPoll('When are you ready to play?', options, {
     is_anonymous: false,
   })
+})
+
+bot.command('config', async (ctx) => {
+  const options = replyOptions(ctx)
+
+  options.reply_markup = Markup.inlineKeyboard(
+    Object.keys(zoneNames).map((tz) => Markup.button.callback(`${zoneNames[tz]}`, `set-tz ${tz}`))
+  ).reply_markup
+  return ctx.reply('Set timezone', options)
+})
+
+bot.action(/set-tz (.+)/, async (ctx) => {
+  await kv.set(`telegram.${ctx.callbackQuery.from.id}.timezone`, ctx.match[1])
+  const userTz = await kv.get(`telegram.${ctx.callbackQuery.from.id}.timezone`)
+  return ctx.answerCbQuery(`Saved ${userTz}`)
 })
 
 bot.command('time', (ctx) => {
@@ -217,7 +233,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse<void>) => {
       return
     }
     let text: string = req.body.text || ''
-    text = text.replace(/\<br\s*\/?\>/gmi, '\n')
+    text = text.replace(/\<br\s*\/?\>/gim, '\n')
     text = sanitizeHtml(text, {
       allowedTags: ['b', 'strong', 'i', 'em', 'u', 'ins', 's', 'strike', 'del', 'a', 'code', 'pre'],
       allowedAttributes: {
@@ -225,7 +241,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse<void>) => {
         code: ['class'],
       },
     })
-    text = text.replace(/<a href="[^"]+">#destiny2<\/a>\s+\[[^]+\]/gmi, '')
+    text = text.replace(/<a href="[^"]+">#destiny2<\/a>\s+\[[^]+\]/gim, '')
 
     await bot.telegram.sendMessage(BOT_TWEET_CHAT_ID, text, {
       disable_notification: true,
