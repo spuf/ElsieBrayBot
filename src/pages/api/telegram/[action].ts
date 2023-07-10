@@ -73,7 +73,7 @@ bot.command('poll', (ctx) => {
   const time = now.plus({ minutes: 10 - (now.minute % 10) })
   const options = [30, 60, 90, 120].map((m) =>
     Object.keys(zoneNames)
-      .map((tz) => `${time.plus({ minutes: m }).setZone(tz).toFormat('HH:mm')} ${zoneNames[tz]}`)
+      .map((tz) => `${time.plus({ minutes: m }).setZone(tz).toFormat('HH:mm')} ${tz.split('/')[1]}`)
       .join(', ')
   )
   options.push('Later')
