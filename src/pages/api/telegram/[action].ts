@@ -62,18 +62,24 @@ bot.start((ctx) =>
   ctx.reply(`I don't even have time to explain why I don't have time to explain.`, Markup.removeKeyboard())
 )
 
-const zoneNames = {
-  'Europe/Moscow': ['Moscow', 'M', 'MSK'],
-  'Europe/London': ['London', 'L', 'LO'],
-  'Europe/Lisbon': ['Lisbon', 'LI'], 
-  'America/Los_Angeles': ['PDT', 'LA']
+const zoneNames: { [key: string]: string } = {
+  'Europe/Moscow': 'Moscow',
+  'Europe/London': 'London',
+  'Europe/Lisbon': 'Lisbon',
+  'America/Los_Angeles': 'PDT',
+}
+const zoneAliases: { [key: string]: string[] } = {
+  'Europe/Moscow': ['moscow', 'msk'],
+  'Europe/London': ['london', 'gmt', 'bst'],
+  'Europe/Lisbon': ['lisbon', 'wet', 'west'],
+  'America/Los_Angeles': ['pdt', 'pst'],
 }
 bot.command('poll', (ctx) => {
   const now = DateTime.now()
   const time = now.plus({ minutes: 10 - (now.minute % 10) })
   const options = [30, 60, 90, 120].map((m) =>
     Object.keys(zoneNames)
-      .map((tz) => `${time.plus({ minutes: m }).setZone(tz).toFormat('HH:mm')} ${tz.split('/')[1]}`)
+      .map((tz) => `${time.plus({ minutes: m }).setZone(tz).toFormat('HH:mm')} ${zoneNames[tz]}`)
       .join(', ')
   )
   options.push('Later')
@@ -109,7 +115,7 @@ bot.command('time', (ctx) => {
     if (argTz) {
       let min: number | null = null
       Object.keys(zoneNames).forEach((tz) => {
-        zoneNames[tz].forEach((tzAlias) => {
+        zoneAliases[tz].forEach((tzAlias) => {
           const cur = levenshtein(argTz.toLowerCase(), tzAlias.toLowerCase())
           if (min == null || min > cur) {
             min = cur
