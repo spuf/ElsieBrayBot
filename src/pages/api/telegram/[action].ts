@@ -69,9 +69,9 @@ const zoneNames: { [key: string]: string } = {
   'America/Los_Angeles': 'PDT',
 }
 const zoneAliases: { [key: string]: string[] } = {
-  'Europe/Moscow': ['moscow', 'msk'],
-  'Europe/London': ['london', 'gmt', 'bst'],
-  'Europe/Lisbon': ['lisbon', 'wet', 'west'],
+  'Europe/Moscow': ['moscow', 'mow', 'msk'],
+  'Europe/London': ['london', 'ldn', 'gmt', 'bst'],
+  'Europe/Lisbon': ['lisbon', 'lsb', 'wet', 'west'],
   'America/Los_Angeles': ['pdt', 'pst'],
 }
 bot.command('poll', (ctx) => {
