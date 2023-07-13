@@ -68,6 +68,12 @@ const zoneNames: { [key: string]: string } = {
   'Europe/Lisbon': 'Lisbon',
   'America/Los_Angeles': 'PDT',
 }
+const zoneAliases: { [key: string]: string[] } = {
+  'Europe/Moscow': ['moscow', 'mow', 'msk'],
+  'Europe/London': ['london', 'ldn', 'gmt', 'bst'],
+  'Europe/Lisbon': ['lisbon', 'lsb', 'wet', 'west'],
+  'America/Los_Angeles': ['pdt', 'pst'],
+}
 bot.command('poll', (ctx) => {
   const now = DateTime.now()
   const time = now.plus({ minutes: 10 - (now.minute % 10) })
@@ -109,11 +115,13 @@ bot.command('time', (ctx) => {
     if (argTz) {
       let min: number | null = null
       Object.keys(zoneNames).forEach((tz) => {
-        const cur = levenshtein(argTz.toLowerCase(), zoneNames[tz].toLowerCase())
-        if (min == null || min > cur) {
-          min = cur
-          reqTz = tz
-        }
+        zoneAliases[tz].forEach((tzAlias) => {
+          const cur = levenshtein(argTz.toLowerCase(), tzAlias.toLowerCase())
+          if (min == null || min > cur) {
+            min = cur
+            reqTz = tz
+          }
+        })
       })
     }
     if (reqTz) {
