@@ -2,7 +2,7 @@ import { captureException } from '@sentry/nextjs'
 import { AxiosError } from 'axios'
 import { DateTime } from 'luxon'
 import type { NextApiRequest, NextApiResponse } from 'next'
-import { Context, Markup, Telegraf, Types } from 'telegraf'
+import { Context, Markup, Telegraf, TelegramError, Types } from 'telegraf'
 import * as Bungie from '../../../lib/bungie'
 import { readUser, saveDestinyManifest, saveUser, UserModel } from '../../../lib/store'
 import { levenshtein } from '../../../lib/string-compare'
@@ -251,12 +251,24 @@ const handler = async (req: NextApiRequest, res: NextApiResponse<void>) => {
     })
     text = text.replace(/<a href="[^"]+">#destiny2<\/a>\s+\[[^]+\]/gim, '')
 
-    await bot.telegram.sendMessage(BOT_TWEET_CHAT_ID, text, {
-      disable_notification: true,
-      disable_web_page_preview: true,
-      protect_content: true,
-      parse_mode: 'HTML',
-    })
+    let chatId: string | number | undefined = BOT_TWEET_CHAT_ID
+    while (chatId) {
+      try {
+        await bot.telegram.sendMessage(chatId, text, {
+          disable_notification: true,
+          disable_web_page_preview: true,
+          protect_content: true,
+          parse_mode: 'HTML',
+        })
+        break
+      } catch (err) {
+        if (err instanceof TelegramError) {
+          chatId = err.response.parameters?.migrate_to_chat_id
+          continue
+        }
+        throw err
+      }
+    }
     res.status(200).end()
     return
   }
