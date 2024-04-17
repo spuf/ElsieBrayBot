@@ -66,12 +66,14 @@ const zoneNames: { [key: string]: string } = {
   'Europe/Moscow': 'Moscow',
   'Europe/London': 'London',
   'Europe/Lisbon': 'Lisbon',
+  'Europe/Berlin': 'Berlin',
   'America/Los_Angeles': 'PDT',
 }
 const zoneAliases: { [key: string]: string[] } = {
   'Europe/Moscow': ['moscow', 'mow', 'msk'],
   'Europe/London': ['london', 'ldn', 'gmt', 'bst'],
   'Europe/Lisbon': ['lisbon', 'lsb', 'wet', 'west'],
+  'Europe/Berlin': ['berlin', 'ber', 'cet', 'cest'],
   'America/Los_Angeles': ['pdt', 'pst'],
 }
 bot.command('poll', (ctx) => {
