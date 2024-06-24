@@ -6,9 +6,6 @@ const dsn = process.env.SENTRY_DSN || process.env.NEXT_PUBLIC_SENTRY_DSN
 const nextConfig = {
   reactStrictMode: true,
   poweredByHeader: false,
-  images: {
-    domains: ['www.bungie.net'],
-  },
   headers: async function () {
     return [
       {
