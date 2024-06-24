@@ -6,22 +6,18 @@ export default function Index() {
   const size = 122
   return (
     <div className="center">
-      <Link href="/guardian">
-        <a>
-          <div
-            style={{
-              position: 'relative',
-              width: `${size}px`,
-              height: `${size}px`,
-              borderRadius: `${size / 2}px`,
-              margin: '1em auto',
-              overflow: 'hidden',
-            }}
-          >
-            <Image src={avatar} alt="Avatar" placeholder="blur" layout="fill" objectFit="contain" />
-          </div>
-        </a>
-      </Link>
+      <div
+        style={{
+          position: 'relative',
+          width: `${size}px`,
+          height: `${size}px`,
+          borderRadius: `${size / 2}px`,
+          margin: '1em auto',
+          overflow: 'hidden',
+        }}
+      >
+        <Image src={avatar} alt="Avatar" placeholder="blur" layout="fill" objectFit="contain" />
+      </div>
 
       <h1>ElsieBrayBot</h1>
 
