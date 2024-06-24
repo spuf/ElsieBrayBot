@@ -1,7 +1,7 @@
 import { captureException } from '@sentry/nextjs'
 import { DateTime } from 'luxon'
 import type { NextApiRequest, NextApiResponse } from 'next'
-import { Context, Markup, Telegraf, TelegramError, Types } from 'telegraf'
+import { Context, Markup, Telegraf } from 'telegraf'
 import { levenshtein } from '../../../lib/string-compare'
 
 const BOT_TOKEN = process.env.BOT_TOKEN as string
@@ -23,9 +23,10 @@ bot.use(async (ctx, next) => {
   }
 })
 
-bot.start((ctx) =>
-  ctx.reply(`I don't even have time to explain why I don't have time to explain.`, Markup.removeKeyboard())
-)
+bot.start(async (ctx) => {
+  await updateSettings()
+  return ctx.reply(`I don't even have time to explain why I don't have time to explain.`, Markup.removeKeyboard())
+})
 
 const zoneNames: { [key: string]: string } = {
   'Europe/Moscow': 'Moscow',
@@ -89,9 +90,27 @@ bot.command('time', (ctx) => {
             tz == reqTz ? `<b>${zoneNames[tz]}</b>` : `<i>${zoneNames[tz]}</i>`
           } UTC${now.setZone(tz).toFormat('Z')}`
       )
-      .join('\n')
+      .join('\n'),
+    { parse_mode: 'HTML' }
   )
 })
+
+async function updateSettings() {
+  try {
+    await Promise.all([
+      bot.telegram.setWebhook(BOT_BASE_URL + BOT_HOOK_ACTION, {
+        max_connections: 1,
+      }),
+      bot.telegram.setMyCommands([
+        { command: 'start', description: 'System wipe' },
+        { command: 'time', description: 'Could you please tell me the time?' },
+      ]),
+    ])
+  } catch (e) {
+    captureException(e)
+    throw e
+  }
+}
 
 const handler = async (req: NextApiRequest, res: NextApiResponse<void>) => {
   if (req.query.action === BOT_CRON_ACTION) {
@@ -100,20 +119,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse<void>) => {
       return
     }
 
-    try {
-      await Promise.all([
-        bot.telegram.setWebhook(BOT_BASE_URL + BOT_HOOK_ACTION, {
-          max_connections: 1,
-        }),
-        bot.telegram.setMyCommands([
-          { command: 'start', description: 'System wipe' },
-          { command: 'time', description: 'Could you please tell me the time?' },
-        ]),
-      ])
-    } catch (e) {
-      captureException(e)
-      throw e
-    }
+    await updateSettings()
     res.status(200).end()
     return
   }
