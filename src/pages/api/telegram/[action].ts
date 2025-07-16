@@ -88,10 +88,10 @@ bot.command('time', (ctx) => {
         (tz) =>
           `${now.setZone(tz).toFormat('HH:mm')} ${
             tz == reqTz ? `<b>${zoneNames[tz]}</b>` : `<i>${zoneNames[tz]}</i>`
-          } UTC${now.setZone(tz).toFormat('Z')}`
+          } UTC${now.setZone(tz).toFormat('Z')}`,
       )
       .join('\n'),
-    { parse_mode: 'HTML' }
+    { parse_mode: 'HTML' },
   )
 })
 
