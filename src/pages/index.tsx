@@ -1,5 +1,4 @@
 import Image from 'next/image'
-import Link from 'next/link'
 import avatar from '../../public/images/avatar.jpg'
 
 export default function Index() {

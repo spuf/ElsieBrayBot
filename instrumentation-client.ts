@@ -7,3 +7,5 @@ if (dsn) {
     tracesSampleRate: 1.0,
   })
 }
+
+export const onRouterTransitionStart = Sentry.captureRouterTransitionStart

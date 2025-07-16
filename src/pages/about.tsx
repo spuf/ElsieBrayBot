@@ -19,7 +19,7 @@ export default function About({ markdown }: InferGetStaticPropsType<typeof getSt
   )
 }
 
-export const getStaticProps: GetStaticProps = async (context) => {
+export const getStaticProps: GetStaticProps = async () => {
   const markdown = await fs.readFile(process.cwd() + '/README.md', 'utf8')
   return { props: { markdown } }
 }
